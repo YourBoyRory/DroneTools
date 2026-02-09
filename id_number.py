@@ -14,6 +14,7 @@ class DroneTag:
         front_color = tuple(int(color.lstrip('#')[i:i+2], 16) for i in (0, 2, 4))
         back_color = (1, 1, 1)
 
+        if drone_type !="": drone_type+= " "
         self.drone_id = self.generate_drone_id(name)
         if qr_data == "": qr_data = self.drone_id
         self.drone_qr = self.generate_drone_qr(qr_data, front_color, back_color)
@@ -21,7 +22,7 @@ class DroneTag:
             logo_color = front_color #(220, 20, 30)
             logo = Image.open(logo)
             self.drone_qr = self.place_qrcode_logo(self.drone_qr, logo, logo_color, back_color)
-        self.drone_tag = self.generate_drone_tag(self.drone_qr, self.drone_id, drone_type+" DRONE", front_color, back_color)
+        self.drone_tag = self.generate_drone_tag(self.drone_qr, self.drone_id, drone_type+"DRONE", front_color, back_color)
 
     def save(self, path=None):
         path=f'{self.drone_id}.png'
@@ -68,17 +69,17 @@ class DroneTag:
             text_width = bbox[2] - bbox[0]
             font_size += 1
         text_height = bbox[3] - bbox[1]
-        padding = 40
+        padding = text_height - 14
         new_img = Image.new("RGB", (qr_img.width, qr_img.height + text_height + padding), back_color)
         draw = ImageDraw.Draw(new_img)
         text_x = (new_img.width - text_width) // 2
-        draw.text((text_x, padding/2), text, fill=front_color, font=font)
+        draw.text((text_x, 20), text, fill=front_color, font=font)
         new_img.paste(qr_img, (0, text_height + padding))
 
         qr_img = new_img.rotate(-90, expand=True)
         text = side_text
         font_size=1
-        margin=80
+        margin= 70 + ((text_height - text_height//2)//2)
         font = ImageFont.truetype("./assets/font.otf", font_size)
         bbox = font.getbbox(text)
         text_width = bbox[2] - bbox[0]
@@ -88,11 +89,11 @@ class DroneTag:
             text_width = bbox[2] - bbox[0]
             font_size += 1
         text_height = bbox[3] - bbox[1]
-        padding = 40
+        padding = text_height - (text_height//2//2) + (len(text)//2)
         new_img = Image.new("RGB", (qr_img.width, qr_img.height + text_height + padding), back_color)
         draw = ImageDraw.Draw(new_img)
         text_x = ((new_img.width) - text_width) // 2
-        draw.text((text_x, padding/2), text, fill=front_color, font=font)
+        draw.text((text_x, 20), text, fill=front_color, font=font)
         new_img.paste(qr_img, (0, text_height + padding))
 
         return new_img.rotate(90, expand=True)
@@ -135,7 +136,7 @@ if __name__ == "__main__":
     name="Rory"
     animal="Pup"
     qr_data = ""
-    logo="./assets/logo.png"
+    logo=""
     color = "#DC141E" #DC141E
 
     drone_tag = DroneTag(name, color, animal, qr_data, logo)
