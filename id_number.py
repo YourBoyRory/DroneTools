@@ -8,25 +8,31 @@ from qrcode.image.styles.colormasks import SolidFillColorMask
 
 class DroneTag:
 
-    def __init__(self, drone_data,  drone_ids=[]):
+    drone_ids = []
+    drone_data=None
+    drone_tag=None
+    drone_id=None
+
+    def __init__(self, drone_data={},  drone_ids=[]):
         self.drone_data = drone_data
+        self.drone_ids = drone_ids
         name = drone_data.get("name", None)
         self.drone_id = self.drone_data.get("drone_id", None)
         if self.drone_id == None:
             if name != None:
-                self.drone_id = self.generate_drone_id(name, drone_ids)
+                self.drone_id = self.generate_drone_id(name, self.drone_ids)
                 self.drone_data["drone_id"] = self.drone_id
             else: return
-        drone_ids.append(self.drone_id)
+        self.drone_ids.append(self.drone_id)
 
-        qr_data = self.drone_data.get("qr_data", self.drone_id)
-        drone_qr = self.place_qrcode_logo(self.generate_drone_qr(qr_data, self.drone_data), self.drone_data)
-        self.drone_tag = self.generate_drone_tag(drone_qr, self.drone_data)
+
+        drone_qr = self.place_qrcode_logo(self.generate_drone_qr(self.drone_data), self.drone_data)
+        self.generate_drone_tag(drone_qr, self.drone_data)
         self.drone_data.pop("name", None)
 
     def save(self, path=None):
-        path=f'{self.drone_id}.png'
-        self.drone_tag.save(path)
+        if path == None and self.drone_id != None: path=f'{self.drone_id}.png'
+        if path != None and self.drone_tag!= None: self.drone_tag.save(path)
 
     def place_qrcode_logo(self, qr_img, drone_data):
         logo = drone_data.get("logo", None)
@@ -71,15 +77,19 @@ class DroneTag:
     def generate_drone_tag(self, qr_img, drone_data):
         front_color = tuple(int(drone_data.get("front_color", "#FFFFFF").lstrip('#')[i:i+2], 16) for i in (0, 2, 4))
         back_color = tuple(int(drone_data.get("back_color", "#010101").lstrip('#')[i:i+2], 16) for i in (0, 2, 4))
+        id_size = drone_data.get("id_size", None)
+        title_size = drone_data.get("title_size", None)
         text = drone_data.get("drone_id", "")
         side_text = drone_data.get("title", "")
+        new_img = qr_img
         if text != "":
-            font_size=81
+            if id_size == None: font_size=81
+            else: font_size=id_size
             margin=75
             font = ImageFont.truetype("./assets/font.otf", font_size)
             bbox = font.getbbox(text)
             text_width = bbox[2] - bbox[0]
-            while text_width <= qr_img.width - margin:
+            while id_size == None and text_width <= qr_img.width - margin:
                 font = ImageFont.truetype("./assets/font.otf", font_size)
                 bbox = font.getbbox(text)
                 text_width = bbox[2] - bbox[0]
@@ -95,16 +105,18 @@ class DroneTag:
         if side_text != "":
             qr_img = new_img.rotate(-90, expand=True)
             text = side_text
-            font_size=1
+            if title_size == None: font_size=1
+            else: font_size=title_size
             margin= 70 + ((text_height - text_height//2)//2)
             font = ImageFont.truetype("./assets/font.otf", font_size)
             bbox = font.getbbox(text)
             text_width = bbox[2] - bbox[0]
-            while text_width <= qr_img.width - margin:
+            while title_size == None and text_width <= qr_img.width - margin:
                 font = ImageFont.truetype("./assets/font.otf", font_size)
                 bbox = font.getbbox(text)
                 text_width = bbox[2] - bbox[0]
                 font_size += 1
+            print(font_size)
             text_height = bbox[3] - bbox[1]
             padding = text_height - (text_height//2//2) + (len(text)//2)
             if any(ord(c) > 127 for c in text): padding = padding//2
@@ -115,11 +127,13 @@ class DroneTag:
             new_img.paste(qr_img, (0, text_height + padding))
             new_img = new_img.rotate(90, expand=True)
 
+        self.drone_tag = new_img
         return new_img
 
-    def generate_drone_qr(self, data, drone_data):
+    def generate_drone_qr(self, drone_data):
         front_color = tuple(int(drone_data.get("front_color", "#FFFFFF").lstrip('#')[i:i+2], 16) for i in (0, 2, 4))
         back_color = tuple(int(drone_data.get("back_color", "#010101").lstrip('#')[i:i+2], 16) for i in (0, 2, 4))
+        data = self.drone_data.get("qr_data", self.drone_id)
         qr = qrcode.QRCode(
             version=None,  # auto size
             error_correction=qrcode.constants.ERROR_CORRECT_H,
@@ -176,7 +190,7 @@ if __name__ == "__main__":
         },
         {
             "drone_id": "#0000",
-            "title": "Hexcrop",
+            "title": "Hexcorp",
             "logo": "./assets/logo2.png",
             "logo_size": 0.252,
             "logo_border": 0.06,
@@ -192,6 +206,27 @@ if __name__ == "__main__":
             "name": "Extra Long Text",
             "title": "Your Extra Long Text Here",
             "front_color": "#1E90FF",
+        },
+        {
+            "name": "Extra short Text",
+            "title": "s",
+            "title_size": 80, # <-- This is needed for small text
+            "front_color": "#1E90FF",
+        },
+        {
+            "name": "Extra big Text",
+            "title": "Small",
+            "title_size": 400,
+            "front_color": "#1E90FF",
+        },
+        {
+            "name": "Extra Small Text",
+            "title": "Small",
+            "title_size": 30,
+            "front_color": "#1E90FF",
+        },
+        {
+            "This will": "get skipped"
         },
         {
             "name": "Rory",
@@ -210,6 +245,6 @@ if __name__ == "__main__":
         #drone_ids = [] # Uncomment this out to disable collision detection
         drone_tag = DroneTag(drone, drone_ids)
         print(f"Droneified: {drone_tag.drone_id} {json.dumps(drone_tag.drone_data, indent=4)}\n")
-        drone_tag.save()
+        drone_tag.save(f"./tests/{drone_tag.drone_id}")
 
 
