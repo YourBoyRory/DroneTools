@@ -26,7 +26,7 @@ drone_data = {
 	"back_color": "#000000",
 	"id_size": 83,
 	"title_size": 69,
-    "logo": "./assets/logo.png",
+    "logo": "./assets/rocket.png",
 	"logo_color": "#DC141E",
     "logo_size": 0.2,
     "logo_border": 0.2

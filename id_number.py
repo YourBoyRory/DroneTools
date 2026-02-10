@@ -189,9 +189,9 @@ if __name__ == "__main__":
         {
             "drone_id": "#0000",
             "title": "Hexcorp",
-            "logo": "./assets/logo2.png",
-            "logo_size": 0.252,
-            "logo_border": 0.06,
+            "logo": "./assets/hex2.png",
+            "logo_size": 0.225,
+            "logo_border": 0.133,
             "front_color": "#AB34C7",
         },
         {
@@ -234,7 +234,7 @@ if __name__ == "__main__":
         {
             "name": "Some Pokemon",
             "title": "Poké Drone",
-            "logo": "./assets/logo.png",
+            "logo": "./assets/rocket.png",
             "front_color": "#DC141E",
         }
     ]
