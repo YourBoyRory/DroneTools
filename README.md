@@ -62,7 +62,7 @@ If none is set then then the `drone_id` will be used.
 	Overrides the title's size.
 
 ### Logo
-- `'logo_color'` Overrides the logo's color, If missing the `front_color` will be used.
-- `'logo_size'` Sets the logo's size. Default is `0.2`.
-- `'logo_border'` Sets the logo's border thickness. Default is `0.2`.
-- `'border_radius'` Sets the logo's border corner roundness. Default is `0.125`.
+- `'logo_color': HEX COLOR` Overrides the logo's color, If missing the `front_color` will be used.
+- `'logo_size': [ 1.0 - 0.0 ]` Sets the logo's size. Default is `0.2`.
+- `'logo_border': [ 1.0 - 0.0 ]` Sets the logo's border thickness. Default is `0.2`.
+- `'border_radius': [ 1.0 - 0.0 ]` Sets the logo's border corner roundness. Default is `0.125`.
