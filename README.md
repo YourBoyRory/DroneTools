@@ -66,8 +66,8 @@ drone_tag = DroneTag(drone_data)
 	Overrides the ID number's size.\
 	When ommited, the ID size is selected automatically.
 - `'title': STRING`\
-	Sets the drone's title on the side bar.\
-	When ommited, the title area will not be rendered.
+	Sets the drone's title on the sidebar.\
+	When ommited, the sidebar will not be rendered.
 - `'title_size': INT`\
 	Overrides the title's size.\
 	When ommited, the ID size is selected automatically.
