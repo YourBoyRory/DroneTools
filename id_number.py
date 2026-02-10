@@ -206,7 +206,7 @@ if __name__ == "__main__":
             "front_color": "#1E90FF",
         },
         {
-            "name": "Short Text",
+            "name": "Short Text", # Hash the same
             "title": "s",
             "title_size": 80, # <-- This is needed for small text
             "front_color": "#1E90FF",
@@ -218,7 +218,7 @@ if __name__ == "__main__":
             "front_color": "#1E90FF",
         },
         {
-            "name": "Small Text",
+            "name": "Small Text", # Hash the same
             "title": "Small",
             "title_size": 30,
             "front_color": "#1E90FF",
