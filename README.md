@@ -43,14 +43,14 @@ drone_tag = DroneTag(drone_data)
 # Docs
 ### General
 - `'front_color': HEX COLOR`\
-  	Sets the color of the text and images.\
+  	Sets the color of text and images.\
   	When ommited, the default is white.
 - `'back_color': HEX COLOR`\
-  	Sets the color of backgroud.\
+  	Sets the color of the backgroud.\
   	When ommited, the default is black.
 - `'qr_data': BYTES|STRING`\
   	Sets what data the QR code stores. 
-	This can be any 'bytes' object or string, and the QR code will change versions to fit the data.\
+	This can be any 'bytes' object or string, and the QR code will change 'versions' to fit the data.\
 	When ommited, `drone_id` will be used as the QR code text.
 
 
