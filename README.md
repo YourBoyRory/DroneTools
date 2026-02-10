@@ -74,11 +74,11 @@ drone_tag = DroneTag(drone_data)
 
 ### Logo
 - `'logo': STRING`\
-  	Path to the logo file. This is intended to be a solid color png.
-  	When ommited, The logo will not be rendered.
+  	Path to the logo file. This is intended to be a solid color png.\
+  	When ommited, the logo will not be rendered.
 - `'logo_color': HEX COLOR`\
   	Overrides the logo's color.\
-  	When ommited, the default is white.
+  	When ommited, `front_color` will be used.
 - `'logo_size': [ 1.0 - 0.0 ]`\
   	Sets the logo's size.\
   	When ommited, the default is `0.2`.
