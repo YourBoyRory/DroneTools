@@ -42,27 +42,46 @@ drone_tag = DroneTag(drone_data)
 
 # Docs
 ### General
-- `'front_color': HEX COLOR` Sets the color of the text and images. Default is white.
-- `'back_color': HEX COLOR` Sets the color of the text and images. Default is black.
-- `'qr_data': BYTES|STRING` Sets what data the QR code stores. 
-This can be any bytes or string, and the QR code will change versions to fit the data.
-If none is set then then the `drone_id` will be used.
+- `'front_color': HEX COLOR`\
+  	Sets the color of the text and images.\
+  	When ommited, the default is white.
+- `'back_color': HEX COLOR`\
+  	Sets the color of backgroud.\
+  	When ommited, the default is black.
+- `'qr_data': BYTES|STRING`\
+  	Sets what data the QR code stores. 
+	This can be any 'bytes' object or string, and the QR code will change versions to fit the data.\
+	When ommited, `drone_id` will be used as the QR code text.
 
 
 ### Text
-- `'name': STRING`
-	The name is hash to create a ID in the format of '00-0000'
-- `'drone_id': STRING`
-	Used to set the ID number and formatting, name is not needed if this is set
-- `'id_size': INT`
-	Overrides the ID number's size.
-- `'title': STRING`
-	Sets the drone's title on the side bar. If missing it will be omitted.
-- `'title_size': INT`
-	Overrides the title's size.
+- `'name': STRING`\
+	The name is hashed to create `drone_id` in the format of '00-0000'.
+	This option is ignore when `drone_id` is set.\
+	If ommited, `drone_id` must be set.
+- `'drone_id': STRING`\
+	Used to set the ID number and formatting. `name` is ignore when this option is set.\
+	If ommited, `name` must be set.
+- `'id_size': INT`\
+	Overrides the ID number's size.\
+	When ommited, the ID size is selected automatically.
+- `'title': STRING`\
+	Sets the drone's title on the side bar.\
+	When ommited, the title area will not be rendered.
+- `'title_size': INT`\
+	Overrides the title's size.\
+	When ommited, the ID size is selected automatically.
 
 ### Logo
-- `'logo_color': HEX COLOR` Overrides the logo's color, If missing the `front_color` will be used.
-- `'logo_size': [ 1.0 - 0.0 ]` Sets the logo's size. Default is `0.2`.
-- `'logo_border': [ 1.0 - 0.0 ]` Sets the logo's border thickness. Default is `0.2`.
-- `'border_radius': [ 1.0 - 0.0 ]` Sets the logo's border corner roundness. Default is `0.125`.
+- `'logo_color': HEX COLOR`\
+  	Overrides the logo's color.\
+  	When ommited, the default is white.
+- `'logo_size': [ 1.0 - 0.0 ]`\
+  	Sets the logo's size.\
+  	When ommited, the default is `0.2`.
+- `'logo_border': [ 1.0 - 0.0 ]`\
+  	Sets the logo's border thickness.\
+  	When ommited, the default is `0.2`.
+- `'border_radius': [ 1.0 - 0.0 ]`\
+  	Sets the logo's border corner roundness.\
+  	When ommited, the default is `0.125`.
