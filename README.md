@@ -14,33 +14,47 @@ pip install -r requirements.txt
 
 ```python
 # import the class
-from id_number import DroneTag
+from DroneTools import DroneTag
+
+drone_ids = [] # This is optional. Used to track used IDs to handle hash collisions.
 
 # Make a drone
 drone_data = {
     "name": "Rory",
-	"drone_id": "03-1312"
-	"qr_data": "03-1312"
+    "drone_id": "03-1312",
+    "qr_data": "03-1312",
     "title": "Poké Drone",
     "front_color": "#DC141E",
-	"back_color": "#000000",
-	"id_size": 83,
-	"title_size": 69,
+    "back_color": "#000000",
+    "id_size": 83,
+    "title_size": 69,
     "logo": "./assets/rocket.png",
-	"logo_color": "#DC141E",
+    "logo_color": "#DC141E",
     "logo_size": 0.2,
-    "logo_border": 0.2
-	"border_radius": 0.125
+    "logo_border": 0.2,
+    "border_radius": 0.125
 }
-drone_tag = DroneTag(drone_data)
+drone_tag = DroneTag(drone_data, drone_ids)
 
-# The only key needed is 'name' or 'drone_id', 
+# The only key needed is 'name' or 'drone_id',
 # name is used to generate a drone_id and the rest will use default values.
 # More Examples in id_number.py
 
 ```
 
 # Docs
+
+`drone_tag = DroneTag(drone_data, drone_ids)`
+
+- `drone_data: DICT` [Required]\
+	Options used to create the drone tag.\
+	Keys and vaues for options are below.
+
+- `drone_ids: ARRAY` [Optional]\
+	Used to store a running list of generated IDs when using the `name` option.
+	This array is not used unless `name` is set\
+	When ommited, hash colitions handling when using the `name` option will be disable.
+
 ### General
 - `'front_color': HEX COLOR`\
   	Sets the color of text and images.\
@@ -57,6 +71,7 @@ drone_tag = DroneTag(drone_data)
 ### Text
 - `'name': STRING`\
 	The name is hashed to create `drone_id` in the format of '00-0000'.
+	The first number is always 0 unless the id exists in `drone_ids`, in which case it will increment.
 	This option is ignore when `drone_id` is set.\
 	If ommited, `drone_id` must be set.
 - `'drone_id': STRING`\
