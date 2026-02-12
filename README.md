@@ -46,6 +46,8 @@ drone_tag = DroneTag(drone_data, drone_ids)
 # Save your tag.
 drone_tag.save("/path/to/output")
 
+# if no path is provided, the image will be stored in the current working directory
+# and will be stored as '[drone_id].png'
 ```
 
 # Docs
