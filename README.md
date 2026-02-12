@@ -3,6 +3,7 @@
 Python Library for creating drone IDs
 
 ![Example Output](./examples/03-1312.png)
+![Example Output](./examples/U992.png)
 
 ## Install Dependancies
 
@@ -22,7 +23,7 @@ drone_ids = [] # This is optional. Used to track used IDs to handle hash collisi
 drone_data = {
     "name": "Rory",
     "drone_id": "03-1312",
-    "qr_data": "03-1312",
+    "code_data": "03-1312",
     "title": "Poké Drone",
     "front_color": "#DC141E",
     "back_color": "#000000",
@@ -62,7 +63,7 @@ drone_tag = DroneTag(drone_data, drone_ids)
 - `'back_color': HEX COLOR`\
   	Sets the color of the backgroud.\
   	When ommited, the default is black.
-- `'qr_data': BYTES|STRING`\
+- `'code_data': STRING`\
   	Sets what data the QR code stores. 
 	This can be any "bytes" object or string, and the QR code will change "versions" to fit the data.\
 	When ommited, `drone_id` will be used as the QR code text.
