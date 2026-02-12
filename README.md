@@ -83,7 +83,22 @@ More examples and tests in DroneTools.py
 	This array is not used unless `name` is set.\
 	When ommited, hash collisions handling when using the `name` option will be disable.
 
-## General
+##### Data Memebers
+- `drone_data DICT`
+	Stored options used to construct the drone tag.
+- `drone_ids: ARRAY`
+	Stored a running list of generated IDs when using the `name` option.
+- `drone_tag: PIL.Image.Image`
+	Stored drone tag image.
+
+##### Methods
+- `save([PATH: STRING])`\
+	Saves the drone tag image to a specified path. 
+	If no path is provided the file is saved under the ID number in the current working directory.
+- `get_image()`\
+	Returns the drone tag image as a `PIL.Image.Image` object. 
+
+## General Options
 - `'front_color': HEX COLOR`\
   	Sets the color of text and images.\
   	When ommited, the default is white.
@@ -91,7 +106,7 @@ More examples and tests in DroneTools.py
   	Sets the color of the backgroud.\
   	When ommited, the default is black.
 
-## Text
+## Text Options
 - `'front_path': STRING`\
   	Sets path for the font file used for text to a custom one.\
   	When ommited, the default font is used.
@@ -135,7 +150,7 @@ More examples and tests in DroneTools.py
 	Set this when using a custom font.\
 	When ommited, the title's padding is selected automatically.
 
-## QR/Barcode
+## QR/Barcode Options
 
 - `'barcode': BOOLEAN`\
   	When 'True' A barcode is generated instead of a QR Code. 

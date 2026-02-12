@@ -1,6 +1,6 @@
 from PIL import Image, ImageDraw, ImageFont
 
-class DroneTag:
+class DroneTag():
 
     drone_ids = []
     drone_data=None
@@ -29,6 +29,8 @@ class DroneTag:
     def save(self, path=None):
         if path == None and self.drone_id != None: path=f'{self.drone_id}.png'
         if path != None and self.drone_tag!= None: self.drone_tag.save(path)
+    def get_image(self):
+        return self.drone_tag
 
     def place_qrcode_logo(self, qr_img, drone_data):
         logo = drone_data.get("logo", None)
