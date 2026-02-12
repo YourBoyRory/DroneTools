@@ -31,7 +31,6 @@ drone_tag = DroneTag(drone_data, drone_ids)
 
 # The only key needed is 'name' or 'drone_id',
 # name is used to generate a drone_id and the rest will use default values.
-# More Examples in DroneTools.py
 
 # Save your tag.
 drone_tag.save("/path/to/output.png")
@@ -69,6 +68,7 @@ drone_tag = DroneTag(drone_data, drone_ids)
 drone_tag.save("/path/to/output.png")
 
 ```
+More examples and tests in DroneTools.py
 
 # Docs
 
