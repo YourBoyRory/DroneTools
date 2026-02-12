@@ -49,6 +49,7 @@ drone_data = {
 	"barcode_height": 20, # Ignored in this example because 'barcode' is False
     "barcode": False, 
     "title": "Poké Drone",
+	"square": False,
     "front_color": "#DC141E",
     "back_color": "#000000",
     "id_size": 83,
@@ -105,6 +106,9 @@ More examples and tests in DroneTools.py
 - `'back_color': HEX COLOR`\
   	Sets the color of the backgroud.\
   	When ommited, the default is black.
+- `'back_color': BOOLEAN`\
+  	When 'True' the generated image is a perfect square.\
+  	When ommited, the default is 'False'.
 
 ## Text Options
 - `'front_path': STRING`\
@@ -153,7 +157,7 @@ More examples and tests in DroneTools.py
 ## QR/Barcode Options
 
 - `'barcode': BOOLEAN`\
-  	When 'True' A barcode is generated instead of a QR Code. 
+  	When 'True' a barcode is generated instead of a QR Code. 
 	This should only be used with small sizes of data, such as the ID number. Links or messages should use a QR code.\
 	Logo options are ignored in this mode.\
 	When ommited, the default is 'False'.
