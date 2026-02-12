@@ -79,7 +79,7 @@ class DroneTag():
         id_margin = drone_data.get("id_margin", 75)
         title_size = drone_data.get("title_size", None)
         title_margin = drone_data.get("title_margin", 70)
-        square = drone_data.get("square", True)
+        square = drone_data.get("square", False)
         text = drone_data.get("drone_id", "")
         side_text = drone_data.get("title", "")
         barcode = self.drone_data.get("barcode", False)
@@ -238,7 +238,6 @@ if __name__ == "__main__":
             "drone_id": "U992",
             "barcode": True,
             "font_path": "./assets/font2.otf",
-            "square": True,
             "title": "Drone",
             "front_color": "#FF8C00",
         },
@@ -270,6 +269,7 @@ if __name__ == "__main__":
             "font_path": "./assets/font3.otf",
             "qr_roundness": 0.3,
             "id_padding": 30,
+            "square": True,
             "back_color": "#b2aa83",
             "front_color": "#4f603b",
         },
