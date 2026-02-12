@@ -2,8 +2,10 @@
 
 Python Library for creating drone IDs
 
-![Example Output](./examples/03-1312.png)
-![Example Output](./examples/U992.png)
+<img src="https://raw.githubusercontent.com/YourBoyRory/DroneTools/refs/heads/main/examples/03-1312.png" width="300" />
+<img src="https://raw.githubusercontent.com/YourBoyRory/DroneTools/refs/heads/main/examples/%230000.png" width="300" />
+<img src="https://raw.githubusercontent.com/YourBoyRory/DroneTools/refs/heads/main/examples/U992.png" width="354" />
+<img src="https://raw.githubusercontent.com/YourBoyRory/DroneTools/refs/heads/main/examples/12-1290.png" width="244" />
 
 ## Install Dependancies
 
@@ -24,6 +26,7 @@ drone_data = {
     "name": "Rory",
     "drone_id": "03-1312",
     "code_data": "03-1312",
+	"barcode": False
     "title": "Poké Drone",
     "front_color": "#DC141E",
     "back_color": "#000000",
@@ -63,10 +66,14 @@ drone_tag = DroneTag(drone_data, drone_ids)
 - `'back_color': HEX COLOR`\
   	Sets the color of the backgroud.\
   	When ommited, the default is black.
-- `'code_data': STRING`\
+- `'code_data': BYTES|STRING`\
   	Sets what data the QR code stores. 
 	This can be any "bytes" object or string, and the QR code will change "versions" to fit the data.\
 	When ommited, `drone_id` will be used as the QR code text.
+- `'barcode': BOOLEAN`\
+  	When 'True' A barcode is generated instead of a QR Code. 
+	This should only be used with small sizes of data, such as the ID number. Links or messages should use a QR code.\
+	When ommited, the default is 'False'.
 
 
 ### Text
