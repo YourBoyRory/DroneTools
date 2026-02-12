@@ -302,7 +302,7 @@ if __name__ == "__main__":
     for drone in drones[:]:
         #drone_ids = [] # Uncomment this out to disable collision detection
         drone_tag = DroneTag(drone, drone_ids)
-        #print(f"Droneified: {drone_tag.drone_id} {json.dumps(drone_tag.drone_data, indent=4)}\n")
+        print(f"Droneified: {drone_tag.drone_id} {json.dumps(drone_tag.drone_data, indent=4)}\n")
         if drone_tag.drone_id != None: drone_tag.save(f"./examples/{drone_tag.drone_id}.png")
 
 
