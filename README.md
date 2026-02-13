@@ -148,11 +148,11 @@ More examples and tests in DroneTools.py
 - `'drone_id': STRING`\
     Used to set the ID number and formatting. `name` is ignore when this option is set.\
     If ommited, `name` must be set.
-- `'id_shift': INT`\
-    TODO: Write Entry
 - `'id_size': INT`\
     Overrides the ID number's size.\
     When ommited, the ID's size is selected automatically.
+- `'id_shift': INT`\
+    TODO: Write Entry
 - `'id_margin_override': INT`\
     Overrides the margin on the left and right of the ID.\
     Set this when using a custom font.\
@@ -168,6 +168,7 @@ More examples and tests in DroneTools.py
     Sets the drone's title on the sidebar.\
     When ommited, the sidebar will not be rendered.
 - `'title_shift': INT`\
+    TODO: Write Entry
 - `'title_size': INT`\
     Overrides the title's size.\
     When ommited, the title's size is selected automatically.
