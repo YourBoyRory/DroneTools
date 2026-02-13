@@ -8,22 +8,31 @@ class DroneTag():
     drone_id=None
 
     def __init__(self, drone_data={},  drone_ids=[]):
+
+        # Set variables
         self.drone_data = drone_data
         self.drone_ids = drone_ids
         name = drone_data.get("name", None)
         self.drone_id = self.drone_data.get("drone_id", None)
+
+        # Generate ID number
         if self.drone_id == None:
             if name != None:
                 self.drone_id = self.generate_drone_id(name, self.drone_ids)
                 self.drone_data["drone_id"] = self.drone_id
-            else: return
+            else: return # if the user provided nothing, well just return. Maybe they just wanna use the functions.
         self.drone_ids.append(self.drone_id)
 
+        # Generate Code
         if self.drone_data.get("barcode", False):
             drone_code = self.generate_drone_barcode(self.drone_data)
         else:
             drone_code = self.place_qrcode_logo(self.generate_drone_qr(self.drone_data), self.drone_data)
+
+        # Construct Tag
         self.generate_drone_tag(drone_code, self.drone_data)
+
+        # delete the name, it is no longer needed.
         self.drone_data.pop("name", None)
 
     def save(self, path=None):
@@ -32,60 +41,21 @@ class DroneTag():
     def get_image(self):
         return self.drone_tag
 
-    def place_qrcode_logo(self, qr_img, drone_data):
-        logo = drone_data.get("logo", None)
-        if logo == None:
-            return qr_img
-        else: logo = Image.open(logo)
-        logo_mod = drone_data.get("logo_size", 0.2)
-        logo_border = drone_data.get("logo_border", 0.2)
-        border_radius = drone_data.get("border_radius", 0.125)
-        front_color = drone_data.get("logo_color",
-        tuple(int(drone_data.get("front_color", "#FFFFFF").lstrip('#')[i:i+2], 16) for i in (0, 2, 4)))
-        back_color = tuple(int(drone_data.get("back_color", "#010101").lstrip('#')[i:i+2], 16) for i in (0, 2, 4))
+    def generate_drone_tag(self, code_img, drone_data):
 
-        qr_img = qr_img.convert("RGBA")
-        logo = logo.convert("RGBA")
-        r, g, b, a = logo.split()
-        logo = Image.new("RGBA", logo.size, (*front_color, 255))
-        logo.putalpha(a)
-        qr_w, qr_h = qr_img.size
-        logo_size = int(qr_w*logo_mod)
-        logo = logo.resize((logo_size, logo_size), Image.LANCZOS)
-        pad = int(logo_size*logo_border)
-        bg_size = logo_size + pad * 2
-        bg = Image.new("RGBA", (bg_size, bg_size), (0, 0, 0, 0))
-        draw = ImageDraw.Draw(bg)
-        radius = int(bg_size*border_radius)
-        draw.rounded_rectangle(
-            (0, 0, bg_size, bg_size),
-            radius=radius,
-            fill=(*back_color, 255),
-        )
-        bg_x = (qr_w - bg_size) // 2
-        bg_y = (qr_h - bg_size) // 2
-        logo_x = (qr_w - logo_size) // 2
-        logo_y = (qr_h - logo_size) // 2
-        qr_img.paste(bg, (bg_x, bg_y), bg)
-        qr_img.paste(logo, (logo_x, logo_y), logo)
-
-        return qr_img.convert("RGB")
-
-    def generate_drone_tag(self, qr_img, drone_data):
-
-        new_img = qr_img
+        new_img = code_img
 
         # Get Options
         front_color = tuple(int(drone_data.get("front_color", "#FFFFFF").lstrip('#')[i:i+2], 16) for i in (0, 2, 4))
         back_color = tuple(int(drone_data.get("back_color", "#010101").lstrip('#')[i:i+2], 16) for i in (0, 2, 4))
         square = drone_data.get("square", False)
-        barcode = self.drone_data.get("barcode", False)
+        is_barcode = self.drone_data.get("barcode", False)
         # Spacing
-        top_padding = drone_data.get("top_padding",(20 - qr_img.width//25) + 20)
-        if barcode: bottom_padding = drone_data.get("bottom_padding", 30)
+        top_padding = drone_data.get("top_padding",(20 - code_img.width//25) + 20)
+        if is_barcode: bottom_padding = drone_data.get("bottom_padding", 30)
         else: bottom_padding = drone_data.get("bottom_padding", 0)
         left_padding = drone_data.get("left_padding", top_padding)
-        right_padding = drone_data.get("bottom_padding", 0)
+        right_padding = drone_data.get("right_padding", 0)
         #Text
         font_path = drone_data.get("font_path", "./assets/font.otf")
         text_margin = drone_data.get("text_margin", 75)
@@ -97,31 +67,35 @@ class DroneTag():
         side_text = drone_data.get("title", "")
         title_size = drone_data.get("title_size", None)
 
+        def __generate_text(text, text_margin, modifier, text_spacing, reqested_size=None):
+            # Set Font size
+            font_size=1
+            if reqested_size == None:
+                # Auto Set Font
+                font_size = 1
+                text_width = 0
+                while text_width <= code_img.width - text_margin:
+                    font = ImageFont.truetype(font_path, font_size)
+                    bbox = font.getbbox(text)
+                    text_width = bbox[2] - bbox[0]
+                    font_size += 1
+            else:
+                # Set Size from option
+                font_size=reqested_size
+                font = ImageFont.truetype(font_path, font_size)
+                bbox = font.getbbox(text)
+                text_width = bbox[2] - bbox[0]
+            text_height = int((bbox[3] - bbox[1])*modifier) + text_spacing
+            if any(ord(c) > 127 for c in side_text): text_height = int(text_height*.75)
+            return font, text_height, text_width
+
         # Render Top Text
         if text != "":
             # Set Font size
-            font_size=1
-            if id_size == None:
-                # Auto Set Font
-                font_size = 1
-                id_text_width = 0
-                while id_text_width <= qr_img.width - text_margin:
-                    font = ImageFont.truetype(font_path, font_size)
-                    bbox = font.getbbox(text)
-                    id_text_width = bbox[2] - bbox[0]
-                    font_size += 1
-            else:
-                # Auto Set Size from option
-                font = ImageFont.truetype(font_path, font_size)
-                bbox = font.getbbox(text)
-                id_text_width = bbox[2] - bbox[0]
-                font_size=id_size
-            id_text_height = int((bbox[3] - bbox[1])*1.4) + text_spacing
-            num = bbox[3] - bbox[1]
-            #print(id_text_height, num*.4)
+            font, id_text_height, id_text_width = __generate_text(text, text_margin, 1.4, text_spacing, id_size)
 
             # Draw new canvase
-            new_img = Image.new("RGB", (qr_img.width, qr_img.height + id_text_height + bottom_padding + top_padding), back_color)
+            new_img = Image.new("RGB", (code_img.width, code_img.height + id_text_height + bottom_padding + top_padding), back_color)
             draw = ImageDraw.Draw(new_img)
 
             # Center Text
@@ -129,36 +103,19 @@ class DroneTag():
             draw.text((text_x, top_padding), text, fill=front_color, font=font)
 
             # Set Image
-            new_img.paste(qr_img, (0, id_text_height+top_padding))
+            new_img.paste(code_img, (0, id_text_height+top_padding))
 
         # Render Side Text
         if side_text != "":
             # Rotate the image 90 degrees to make it easier to work with
-            qr_img = new_img.rotate(-90, expand=True)
+            code_img = new_img.rotate(-90, expand=True)
 
             # Set Font size
-            if barcode: text_margin += 20
-            font_size=1
-            if id_size == None:
-                # Auto Set Font
-                font_size = 1
-                title_text_width = 0
-                while title_text_width <= qr_img.width - text_margin:
-                    font = ImageFont.truetype(font_path, font_size)
-                    bbox = font.getbbox(side_text)
-                    title_text_width = bbox[2] - bbox[0]
-                    font_size += 1
-            else:
-                # Auto Set Size from option
-                font = ImageFont.truetype(font_path, font_size)
-                bbox = font.getbbox(side_text)
-                title_text_width = bbox[2] - bbox[0]
-                font_size=id_size
-            title_text_height = int((bbox[3] - bbox[1])*1.35) + text_spacing
-            if any(ord(c) > 127 for c in side_text): title_text_height = int(title_text_height*.75)
+            if is_barcode: text_margin += 20
+            font, title_text_height, title_text_width = __generate_text(side_text, text_margin, 1.35, text_spacing, title_size)
 
             # Draw new canvase
-            new_img = Image.new("RGB", (qr_img.width, qr_img.height + title_text_height + right_padding + left_padding), back_color)
+            new_img = Image.new("RGB", (code_img.width, code_img.height + title_text_height + right_padding + left_padding), back_color)
             draw = ImageDraw.Draw(new_img)
 
             # Center Text
@@ -166,7 +123,7 @@ class DroneTag():
             draw.text((text_x, left_padding), side_text, fill=front_color, font=font)
 
             # Set image and rotate image back to normal
-            new_img.paste(qr_img, (0, title_text_height+left_padding))
+            new_img.paste(code_img, (0, title_text_height+left_padding))
             new_img = new_img.rotate(90, expand=True)
 
         # Square off image
@@ -183,17 +140,70 @@ class DroneTag():
         self.drone_tag = new_img
         return new_img
 
+    def place_qrcode_logo(self, qr_img, drone_data):
+
+        # Get options
+        logo = drone_data.get("logo", None)
+        if logo == None:
+            return qr_img # if no logo is provided, do nothing.
+        else: logo = Image.open(logo)
+        logo_mod = drone_data.get("logo_size", 0.2)
+        logo_border = drone_data.get("logo_border", 0.2)
+        border_radius = drone_data.get("border_radius", 0.125)
+        front_color = drone_data.get("logo_color",
+        tuple(int(drone_data.get("front_color", "#FFFFFF").lstrip('#')[i:i+2], 16) for i in (0, 2, 4)))
+        back_color = tuple(int(drone_data.get("back_color", "#010101").lstrip('#')[i:i+2], 16) for i in (0, 2, 4))
+        qr_img = qr_img.convert("RGBA")
+        logo = logo.convert("RGBA")
+
+        # Recolor logo
+        r, g, b, a = logo.split()
+        logo = Image.new("RGBA", logo.size, (*front_color, 255))
+        logo.putalpha(a)
+
+        # Resize Logo
+        qr_w, qr_h = qr_img.size
+        logo_size = int(qr_w*logo_mod) # Calcuale logo size
+        logo = logo.resize((logo_size, logo_size), Image.LANCZOS)
+
+        # Add logo border
+        pad = int(logo_size*logo_border) # Calcuale border padding
+        bg_size = logo_size + pad * 2    # Calcuale border size
+        bg = Image.new("RGBA", (bg_size, bg_size), (0, 0, 0, 0))
+        draw = ImageDraw.Draw(bg)
+        # Round conrners
+        radius = int(bg_size*border_radius)
+        draw.rounded_rectangle(
+            (0, 0, bg_size, bg_size),
+            radius=radius,
+            fill=(*back_color, 255),
+        )
+
+        # Center Logo
+        bg_x = (qr_w - bg_size) // 2
+        bg_y = (qr_h - bg_size) // 2
+        logo_x = (qr_w - logo_size) // 2
+        logo_y = (qr_h - logo_size) // 2
+        qr_img.paste(bg, (bg_x, bg_y), bg)
+        qr_img.paste(logo, (logo_x, logo_y), logo)
+
+        return qr_img.convert("RGB")
+
     def generate_drone_qr(self, drone_data):
 
+        # Imports for this function
         import qrcode
         from qrcode.image.styledpil import StyledPilImage
         from qrcode.image.styles.moduledrawers import RoundedModuleDrawer,SquareModuleDrawer
         from qrcode.image.styles.colormasks import SolidFillColorMask
 
+        # Get Options
         front_color = tuple(int(drone_data.get("front_color", "#FFFFFF").lstrip('#')[i:i+2], 16) for i in (0, 2, 4))
         back_color = tuple(int(drone_data.get("back_color", "#010101").lstrip('#')[i:i+2], 16) for i in (0, 2, 4))
         qr_roundness = drone_data.get("qr_roundness", 1)
         data = self.drone_data.get("code_data", self.drone_id)
+
+        # QR code generation
         qr = qrcode.QRCode(
             version=None,  # auto size
             error_correction=qrcode.constants.ERROR_CORRECT_H,
@@ -211,17 +221,22 @@ class DroneTag():
                 front_color=front_color,
             ),
         )
+
         return qr_img.convert("RGB")
 
     def generate_drone_barcode(self, drone_data):
 
+        # Imports for this function
         import barcode
         from barcode.writer import ImageWriter
 
+         # Get Options
         front_color = tuple(int(drone_data.get("front_color", "#FFFFFF").lstrip('#')[i:i+2], 16) for i in (0, 2, 4))
         back_color = tuple(int(drone_data.get("back_color", "#010101").lstrip('#')[i:i+2], 16) for i in (0, 2, 4))
         data = self.drone_data.get("code_data", self.drone_id)
         barcode_height = self.drone_data.get("barcode_height", len(data)+6)
+
+        # Barcode generation
         code128 = barcode.get("Code128", data, writer=ImageWriter())
         img = code128.render(
             {
@@ -234,10 +249,11 @@ class DroneTag():
                 "background": back_color
             }
         )
-        return img
-        img.save("test.png")
+
+        return img.convert("RGB")
 
     def generate_drone_id(self, name, ids=[]):
+        # This just does a bunch of stuff to convert a string to a small number.
         name = name.upper()
         base_number=(ord(name[0]) // 10) * 10
         id_number=f"0{ord(name[0])%10}-"
@@ -253,9 +269,9 @@ class DroneTag():
 
 
 
-"""
-    EXAMPLE USAGE AND UNIT TEST
-"""
+#=======================================#
+###    EXAMPLE USAGE AND UNIT TEST    ###
+#=======================================#
 if __name__ == "__main__":
 
     import os, json
@@ -264,7 +280,7 @@ if __name__ == "__main__":
         for f in os.listdir(".")
         if f.lower().endswith(".png")
     ]
-    drone_ids = [] # Comment this out to enable loading drone name
+    drone_ids = [] # Comment this out to enable loading existing drone name
 
     drones = [
         # Feat Test
@@ -290,13 +306,13 @@ if __name__ == "__main__":
             "drone_id": "#0000",
             "title": "Hexcorp",
             "logo": "./assets/hex2.png",
-            "logo_size": 0.225,
-            "logo_border": 0.133,
+            "logo_size": 0.225,    # <-- Logos usally need tweaking
+            "logo_border": 0.133,  # <-- Logos usally need tweaking
             "front_color": "#AB34C7",
         },
         # QR Data
         {
-            "name": "Website",
+            "name": "Long Website",
             "title": "Somename",
             "code_data": "https://www.example.com/make_this_qr_code_massive_please/make_this_qr_code_EVENMORE_massive_please",
             "front_color": "#FFFF00",
@@ -307,8 +323,8 @@ if __name__ == "__main__":
             "code_data": "https://www.example.com/",
             "font_path": "./assets/font3.otf",
             "qr_roundness": 0.3,
-            "text_padding": -35,
-            "top_padding": 40,
+            "text_padding": -35, # <-- Custom fonts usally need tweaking, See Custom Spacing example bellow
+            "top_padding": 40,   # <-- Custom fonts usally need tweaking, See Custom Spacing example bellow
             "back_color": "#b2aa83",
             "front_color": "#4f603b",
         },
@@ -319,44 +335,53 @@ if __name__ == "__main__":
             "front_color": "#1E90FF",
         },
         {
-            "name": "Short Text", # Hash the same
+            "name": "Short Text", # Some words hash the same, such as "Short Text" and "Small Text"
             "title": "s",
-            "title_size": 80, # <-- This is needed for small text
+            "title_size": 80,     # <-- This may be desired for short text
             "front_color": "#1E90FF",
         },
         {
-            "name": "Big Text",
+            "name": "Big Text And Squared",
             "title": "BIG TEXT",
             "title_size": 400,
             "square": True,
             "front_color": "#1E90FF",
         },
         {
-            "name": "Small Text", # Hash the same
+            "name": "Small Text", # Some words hash the same, such as "Short Text" and "Small Text"
             "title": "Small",
             "title_size": 30,
-            "title_padding": 30,
             "front_color": "#1E90FF",
         },
         {
-            "name": "Spacing", # Hash the same
+            "name": "Custom Spacing",
             "title": "Custom Spacing",
-            "id_padding": 70,
-            "id_margin": 150,
-            "title_padding": 90,
-            "title_margin": 200,
+            "text_padding": 150,
+            "text_margin": 150,
+            "top_padding": -10,
+            "bottom_padding": 100,
+            "left_padding": 75,
+            "right_padding": 100,
             "front_color": "#1E90FF",
         },
         # Stability Test
         {
-            "This will": "get skipped"
+            "This Will": "Get Skipped"
         },
     ]
 
+    skips = []
     for drone in drones[:]:
         #drone_ids = [] # Uncomment this out to disable collision detection
+        test_name = drone.get("name", drone.get("title", drone.get("drone_id", list(drone.values())[0])))
         drone_tag = DroneTag(drone, drone_ids)
-        print(f"Droneified: {drone_tag.drone_id} {json.dumps(drone_tag.drone_data, indent=4)}\n")
+        print(f"Test: {test_name} {json.dumps(drone_tag.drone_data, indent=4)}\n")
         if drone_tag.drone_id != None: drone_tag.save(f"./examples/{drone_tag.drone_id}.png")
+        else: skips.append(test_name)
+
+    if skips != []:
+        print(f"Skipped:")
+        for test in skips:
+            print(f"    '{test}'")
 
 
