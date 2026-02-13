@@ -72,65 +72,104 @@ class DroneTag():
         return qr_img.convert("RGB")
 
     def generate_drone_tag(self, qr_img, drone_data):
+
+        new_img = qr_img
+
+        # Get Options
         front_color = tuple(int(drone_data.get("front_color", "#FFFFFF").lstrip('#')[i:i+2], 16) for i in (0, 2, 4))
         back_color = tuple(int(drone_data.get("back_color", "#010101").lstrip('#')[i:i+2], 16) for i in (0, 2, 4))
-        font_path = drone_data.get("font_path", "./assets/font.otf")
-        id_size = drone_data.get("id_size", None)
-        id_margin = drone_data.get("id_margin", 75)
-        title_size = drone_data.get("title_size", None)
-        title_margin = drone_data.get("title_margin", 70)
         square = drone_data.get("square", False)
-        text = drone_data.get("drone_id", "")
-        side_text = drone_data.get("title", "")
         barcode = self.drone_data.get("barcode", False)
-        new_img = qr_img
-        if text != "":
-            if id_size == None: font_size=1
-            else: font_size=id_size
-            font = ImageFont.truetype(font_path, font_size)
-            bbox = font.getbbox(text)
-            text_width = bbox[2] - bbox[0]
-            while id_size == None and text_width <= qr_img.width - id_margin:
-                font = ImageFont.truetype(font_path, font_size)
-                bbox = font.getbbox(text)
-                text_width = bbox[2] - bbox[0]
-                font_size += 1
-            text_height = bbox[3] - bbox[1]
-            padding = drone_data.get("id_padding", text_height - 14)
-            if barcode: extra_pad = qr_img.height//20
-            else: extra_pad=0
-            new_img = Image.new("RGB", (qr_img.width, qr_img.height + text_height + padding + extra_pad), back_color)
-            draw = ImageDraw.Draw(new_img)
-            text_x = (new_img.width - text_width) // 2
-            draw.text((text_x, 20), text, fill=front_color, font=font)
-            new_img.paste(qr_img, (0, text_height + padding))
+        # Spacing
+        top_padding = drone_data.get("top_padding",(20 - qr_img.width//25) + 20)
+        if barcode: bottom_padding = drone_data.get("bottom_padding", 30)
+        else: bottom_padding = drone_data.get("bottom_padding", 0)
+        left_padding = drone_data.get("left_padding", top_padding)
+        right_padding = drone_data.get("bottom_padding", 0)
+        #Text
+        font_path = drone_data.get("font_path", "./assets/font.otf")
+        text_margin = drone_data.get("text_margin", 75)
+        text_spacing = drone_data.get("text_padding", 0)
+        # ID
+        text = drone_data.get("drone_id", "")
+        id_size = drone_data.get("id_size", None)
+        # Title
+        side_text = drone_data.get("title", "")
+        title_size = drone_data.get("title_size", None)
 
-        if side_text != "":
-            qr_img = new_img.rotate(-90, expand=True)
-            text = side_text
-            if title_size == None: font_size=1
-            else: font_size=title_size
-            if barcode: less_margin = 7
-            else: less_margin=0
-            title_margin = title_margin + ((text_height - text_height//2)//2) - less_margin
-            font = ImageFont.truetype(font_path, font_size)
-            bbox = font.getbbox(text)
-            text_width = bbox[2] - bbox[0]
-            while title_size == None and text_width <= qr_img.width - title_margin:
+        # Render Top Text
+        if text != "":
+            # Set Font size
+            font_size=1
+            if id_size == None:
+                # Auto Set Font
+                font_size = 1
+                id_text_width = 0
+                while id_text_width <= qr_img.width - text_margin:
+                    font = ImageFont.truetype(font_path, font_size)
+                    bbox = font.getbbox(text)
+                    id_text_width = bbox[2] - bbox[0]
+                    font_size += 1
+            else:
+                # Auto Set Size from option
                 font = ImageFont.truetype(font_path, font_size)
                 bbox = font.getbbox(text)
-                text_width = bbox[2] - bbox[0]
-                font_size += 1
-            text_height = bbox[3] - bbox[1]
-            padding = drone_data.get("title_padding", text_height - (text_height//2//2) + (len(text)//2))
-            if any(ord(c) > 127 for c in text): padding = padding//2
-            new_img = Image.new("RGB", (qr_img.width, qr_img.height + text_height + padding), back_color)
+                id_text_width = bbox[2] - bbox[0]
+                font_size=id_size
+            id_text_height = int((bbox[3] - bbox[1])*1.4) + text_spacing
+            num = bbox[3] - bbox[1]
+            #print(id_text_height, num*.4)
+
+            # Draw new canvase
+            new_img = Image.new("RGB", (qr_img.width, qr_img.height + id_text_height + bottom_padding + top_padding), back_color)
             draw = ImageDraw.Draw(new_img)
-            text_x = ((new_img.width) - text_width) // 2
-            draw.text((text_x, 20), text, fill=front_color, font=font)
-            new_img.paste(qr_img, (0, text_height + padding))
+
+            # Center Text
+            text_x = (new_img.width - id_text_width) // 2
+            draw.text((text_x, top_padding), text, fill=front_color, font=font)
+
+            # Set Image
+            new_img.paste(qr_img, (0, id_text_height+top_padding))
+
+        # Render Side Text
+        if side_text != "":
+            # Rotate the image 90 degrees to make it easier to work with
+            qr_img = new_img.rotate(-90, expand=True)
+
+            # Set Font size
+            if barcode: text_margin += 20
+            font_size=1
+            if id_size == None:
+                # Auto Set Font
+                font_size = 1
+                title_text_width = 0
+                while title_text_width <= qr_img.width - text_margin:
+                    font = ImageFont.truetype(font_path, font_size)
+                    bbox = font.getbbox(side_text)
+                    title_text_width = bbox[2] - bbox[0]
+                    font_size += 1
+            else:
+                # Auto Set Size from option
+                font = ImageFont.truetype(font_path, font_size)
+                bbox = font.getbbox(side_text)
+                title_text_width = bbox[2] - bbox[0]
+                font_size=id_size
+            title_text_height = int((bbox[3] - bbox[1])*1.35) + text_spacing
+            if any(ord(c) > 127 for c in side_text): title_text_height = int(title_text_height*.75)
+
+            # Draw new canvase
+            new_img = Image.new("RGB", (qr_img.width, qr_img.height + title_text_height + right_padding + left_padding), back_color)
+            draw = ImageDraw.Draw(new_img)
+
+            # Center Text
+            text_x = ((new_img.width) - title_text_width) // 2
+            draw.text((text_x, left_padding), side_text, fill=front_color, font=font)
+
+            # Set image and rotate image back to normal
+            new_img.paste(qr_img, (0, title_text_height+left_padding))
             new_img = new_img.rotate(90, expand=True)
 
+        # Square off image
         if square:
             long_size = max(new_img.width, new_img.height)
             short_size =min(new_img.width, new_img.height)
@@ -237,6 +276,7 @@ if __name__ == "__main__":
         {
             "drone_id": "U992",
             "barcode": True,
+            "square": True,
             "font_path": "./assets/font2.otf",
             "title": "Drone",
             "front_color": "#FF8C00",
@@ -268,7 +308,8 @@ if __name__ == "__main__":
             "code_data": "https://www.example.com/",
             "font_path": "./assets/font3.otf",
             "qr_roundness": 0.3,
-            "id_padding": 30,
+            "text_padding": -35,
+            "top_padding": 40,
             "back_color": "#b2aa83",
             "front_color": "#4f603b",
         },
@@ -316,7 +357,7 @@ if __name__ == "__main__":
     for drone in drones[:]:
         #drone_ids = [] # Uncomment this out to disable collision detection
         drone_tag = DroneTag(drone, drone_ids)
-        print(f"Droneified: {drone_tag.drone_id} {json.dumps(drone_tag.drone_data, indent=4)}\n")
+        #print(f"Droneified: {drone_tag.drone_id} {json.dumps(drone_tag.drone_data, indent=4)}\n")
         if drone_tag.drone_id != None: drone_tag.save(f"./examples/{drone_tag.drone_id}.png")
 
 
