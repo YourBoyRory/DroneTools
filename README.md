@@ -139,12 +139,12 @@ More examples and tests in DroneTools.py
     When ommited, the default font is used.
 - `'text_margin': INT`\
     Sets the margin on the left and right of all text.
-	This option will be ignored by text using the 'margin_override' option\
+	This option will be ignored by text using the 'margin_override' option.\
     Set this when using a custom font.\
     When ommited, text margins are selected automatically.
 - `'text_padding': INT`\
     Sets the padding seperating all text from the code.
-	This option will be ignored by text using the 'padding_override' option\
+	This option will be ignored by text using the 'padding_override' option.\
     Set this when using a custom font.\
     When ommited, text padding is selected automatically.
 
@@ -167,11 +167,9 @@ More examples and tests in DroneTools.py
 	When ommited, the ID will be centered.
 - `'id_margin_override': INT`\
     Overrides the margin on the left and right of the ID.\
-    Set this when using a custom font.\
     When ommited, the ID's margin is selected automatically.
 - `'id_padding_override': INT`\
     Overrides the padding seperating the ID from the code.\
-    Set this when using a custom font.\
     When ommited, the ID's padding is selected automatically.
 
 ##### Title Options (Side Text)
@@ -188,11 +186,9 @@ More examples and tests in DroneTools.py
 	When ommited, the title will be centered.
 - `'title_margin_override': INT`\
     Overrides the margin on the top and bottom of the title.\
-    Set this when using a custom font.\
     When ommited, the title's margin is selected automatically.
 - `'title_padding_override': INT`\
     Overrides the padding seperating the title from the code.\
-    Set this when using a custom font.\
     When ommited, the title's padding is selected automatically.
 
 ## QR/Barcode Options
