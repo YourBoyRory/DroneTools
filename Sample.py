@@ -123,6 +123,7 @@ def main():
     handlers = [
         {
             'badge_style': 1,
+            'show_badge_holder': True,
             'front_color': "#dc141e",
             'side_text': "Your Name",
             'handler_info': ["Administator of", "00-0000"],
@@ -130,6 +131,7 @@ def main():
         },
         {
             'badge_style': 2,
+            'show_badge_holder': True,
             'front_color': "#dc141e",
             'side_text': "Your Name",
             'handler_info': ["Administator of", "00-0000"],
@@ -137,6 +139,7 @@ def main():
         },
         {
             'badge_style': 3,
+            'show_badge_holder': True,
             'front_color': "#dc141e",
             'side_text': "Your Name",
             'handler_info': ["Administator of", "00-0000"],
