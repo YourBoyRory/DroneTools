@@ -501,35 +501,7 @@ class DroneTag():
 
 # Call Unit tests
 if __name__ == "__main__":
-    #import Sample as sample
-    #sample.main()
-    handlers = [
-        {
-            'badge_style': 1,
-            'front_color': "#dc141e",
-            'side_text': "Your Name",
-            'handler_info': ["Administator of", "00-0000"],
-            'id_image_path': "./assets/id.jpg"
-        },
-        {
-            'badge_style': 2,
-            'front_color': "#dc141e",
-            'side_text': "Your Name",
-            'handler_info': ["Administator of", "00-0000"],
-            'id_image_path': "./assets/id.jpg"
-        },
-        {
-            'badge_style': 3,
-            'front_color': "#dc141e",
-            'side_text': "Your Name",
-            'handler_info': ["Administator of", "00-0000"],
-            'id_image_path': "./assets/id.jpg"
-        },
-    ]
-    for handler in handlers:
-        handler_badge = HandlerBadge(handler)
-        file_name= f"style_{handler['badge_style']}"
-        print(handler)
-        handler_badge.save(f'./samples/{file_name}.png')
+    import Sample as sample
+    sample.main()
 
 
