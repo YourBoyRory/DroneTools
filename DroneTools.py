@@ -1,7 +1,229 @@
 from PIL import Image, ImageDraw, ImageFont
 
 class HandlerBadge():
-    pass
+
+    handler_data = {}
+    handler_badge = None
+
+    def __init__(self, handler_data={}):
+        #generate datacode
+        dronetools = DroneTag()
+        if handler_data.get("barcode", True):
+            # These are not changeable for handlers
+            handler_data['code_data'] = handler_data.get("code_data", handler_data.get("side_text", handler_data.get("handler_info", ["Unknown"])[0]))
+            handler_data['barcode_height'] = 5
+            handler_data['quiet_zone'] = 0
+            hander_code = dronetools.generate_drone_barcode(handler_data)
+        else:
+            handler_data['code_data'] = handler_data.get("code_data", handler_data.get("side_text", handler_data.get("handler_info", ["Unknown"])[0]))
+            front_color, back_color = handler_data.get("front_color", "#FFFFFF"), handler_data.get("back_color", "#010101")
+            if handler_data.get("badge_style", 2) == 2:
+                handler_data['front_color'], handler_data['back_color'] = back_color, front_color
+            hander_code = dronetools.place_qrcode_logo(dronetools.generate_drone_qr(handler_data), handler_data)
+            handler_data['front_color'], handler_data['back_color'] = front_color, back_color
+        self.handler_badge = self.generate_hander_badge(hander_code, handler_data)
+        self.handler_data = handler_data
+
+
+    def save(self, path=None):
+        if path != None and self.handler_badge != None: self.handler_badge.save(path)
+    def get_image(self):
+        return self.handler_badge
+
+    def generate_hander_badge(self, code_img, handler_data):
+
+        # This is a standard
+        badge_width = 670
+        badge_height = 990
+
+        # Not changable
+        margin = 100
+        top_padding = 50
+        bottom_padding=30
+
+        style= handler_data.get("badge_style", 2)
+        barcode = handler_data.get("barcode", True)
+        show_badge_holder = handler_data.get("show_badge_holder", False)
+        front_color = tuple(int(handler_data.get("front_color", "#FFFFFF").lstrip('#')[i:i+2], 16) for i in (0, 2, 4))
+        back_color = tuple(int(handler_data.get("back_color", "#010101").lstrip('#')[i:i+2], 16) for i in (0, 2, 4))
+        font_path = handler_data.get("font_path", "./assets/font.otf")
+        id_image_path = handler_data.get("id_image_path", "./assets/id.jpg")
+
+        title = handler_data.get("top_title", "Drone")
+        subtext = handler_data.get("top_subtext", "Handler")
+        side_text = handler_data.get("side_text", "")
+        handler_info = handler_data.get("handler_info", [])
+
+        # Style def
+        if style == 2: box_color = front_color
+        else: back_color = back_color
+        if style == 3:
+            border_front_color = back_color
+            border_back_color = tuple(max(0, int(c * 0.7)) for c in front_color)
+        else:
+            border_front_color = front_color
+            border_back_color = back_color
+
+        def __generate_text(text, badge_width, text_margin, modifier, text_spacing, reqested_size=None):
+            # Set Font size
+            font_size=1
+            if reqested_size == None:
+                # Auto Set Font
+                font_size = 1
+                text_width = 0
+                while text_width <= badge_width - text_margin:
+                    font = ImageFont.truetype(font_path, font_size)
+                    bbox = font.getbbox(text)
+                    text_width = bbox[2] - bbox[0]
+                    font_size += 1
+            else:
+                # Set Size from option
+                font_size=reqested_size
+                font = ImageFont.truetype(font_path, font_size)
+                bbox = font.getbbox(text)
+                text_width = bbox[2] - bbox[0]
+            text_height = int((bbox[3] - bbox[1])*modifier) + text_spacing
+            if any(ord(c) > 127 for c in text): text_height = int(text_height*.75)
+            return font, text_height, text_width
+
+        # Draw new canvase
+        new_img = Image.new("RGBA", (badge_width, badge_height), border_back_color)
+        draw = ImageDraw.Draw(new_img)
+
+        # Draw badge holder
+        if show_badge_holder:
+            mask = Image.new("L", (badge_width, badge_height), 255)
+            holder_x = (new_img.width - 140) // 2
+            ImageDraw.Draw(mask).rounded_rectangle(
+                (holder_x, 40, holder_x+140, 63),
+                radius=40,
+                fill=0
+            )
+            new_img.putalpha(mask)
+
+        # Draw Title and Subtext
+        title_padding = -20
+        subtext_padding = 35
+        font, title_text_height, title_text_width = __generate_text(title, badge_width, margin, 1.4, title_padding)
+        text_x = (new_img.width - title_text_width) // 2
+        draw.text((text_x, top_padding), title, fill=border_front_color, font=font)
+        font, subtext_text_height, subtext_text_width = __generate_text(subtext, badge_width, margin, 1.4, subtext_padding)
+        text_x = (new_img.width - subtext_text_width) // 2
+        draw.text((text_x, title_text_height+top_padding), subtext, fill=border_front_color, font=font)
+        current_total_height = title_text_height+subtext_text_height+top_padding+subtext_padding+title_padding
+
+        # Load barcode for later
+        if barcode:
+            if style == 3:
+                barcode_padding = bottom_padding*2
+                barcode_margin = margin+50
+            else:
+                barcode_padding = bottom_padding
+                barcode_margin = margin
+            code_img_aspect_ratio = code_img.width /code_img.height
+            code_img_width = badge_width - barcode_margin
+            code_img_height = 150
+            code_img = code_img.resize((code_img_width, code_img_height), Image.LANCZOS)
+            total_code_height = code_img.height+barcode_padding
+        else:
+            total_code_height = 0
+
+        # Image Info Section background
+        bg_width = badge_width-margin
+        if style == 3: bg_padding = bottom_padding
+        else: bg_padding = total_code_height
+        if style == 2:
+            info_back_color = front_color
+            info_front_color = back_color
+        else:
+            info_back_color = back_color
+            info_front_color = front_color
+        bg_height =  badge_height - current_total_height - bg_padding
+
+        bg = Image.new("RGBA", (bg_width, bg_height), (0, 0, 0, 0))
+        # Round conrners
+        ImageDraw.Draw(bg).rounded_rectangle(
+            (0, 0, bg_width, bg_height),
+            radius=bg_width // 15,
+            fill=(*info_back_color, 255),
+        )
+        bg_x = (new_img.width - bg_width) // 2
+        new_img.paste(bg, (bg_x, current_total_height-20), bg)
+
+        # Draw barcode now
+        if barcode:
+            new_img.paste(code_img, (barcode_margin//2, badge_height-code_img.height-barcode_padding))
+
+        # Draw side text
+        if side_text != "":
+            if style == 1:
+                name_top_padding = -20
+                name_bottom_padding = 40
+                name_side_padding= 30
+            else:
+                name_top_padding = 10
+                name_bottom_padding = 0
+                name_side_padding=37
+            if style == 3: name_side_padding = name_side_padding-30
+            name_text_width = badge_height - current_total_height - total_code_height - name_side_padding
+            font, name_text_height, dump = __generate_text(side_text, name_text_width, 0, 1.4, 0)
+            sidetext_img = Image.new("RGB", (name_text_width, name_text_height), info_back_color)
+            draw_sidetext = ImageDraw.Draw(sidetext_img)
+            text_x = (sidetext_img.width - name_text_width) // 2
+            draw_sidetext.text((text_x, 0), side_text, fill=info_front_color, font=font)
+            sidetext_img = sidetext_img.rotate(90, expand=True)
+            new_img.paste(sidetext_img, (((margin//2)+name_top_padding), current_total_height))
+            current_total_width = name_text_height+name_top_padding+name_bottom_padding
+        else:
+            current_total_width = 0
+
+        #Photo
+        badge_photo = Image.open(id_image_path)
+
+        badge_photo = badge_photo.convert("RGBA")
+        bagge_photo_aspect_ratio = badge_photo.width / badge_photo.height
+        bagge_photo_height = badge_width//2
+        bagge_photo_width = int(bagge_photo_height * bagge_photo_aspect_ratio)
+        badge_photo = badge_photo.resize((bagge_photo_width, bagge_photo_height), Image.LANCZOS)
+        if style == 1: photo_x = ((badge_width-current_total_width) - badge_photo.width) - margin//2
+        else: photo_x = ((badge_width-current_total_width) - badge_photo.width) // 2
+        # Create mask for round corners
+        mask = Image.new("L", (badge_photo.width, badge_photo.height), 0)
+        ImageDraw.Draw(mask).rounded_rectangle(
+            (0, 0, badge_photo.width, badge_photo.height),
+            radius=badge_photo.width // 15,
+            fill=255
+        )
+        new_img.paste(badge_photo, (photo_x+current_total_width, current_total_height),mask)
+        current_total_height += badge_photo.height
+
+        # Draw Hander Info
+        print(handler_info)
+        info_top_padding = 15
+        for info_text in handler_info:
+            info_bottom_padding = 0
+            if style == 1: info_margin = margin
+            else: info_margin = margin+50
+            font, info_text_height, info_text_width = __generate_text(info_text, (badge_width-current_total_width), info_margin, 1.4, info_bottom_padding)
+            text_x = ((badge_width-current_total_width) - info_text_width) // 2
+            draw.text((text_x+current_total_width, current_total_height+info_top_padding), info_text, fill=info_front_color, font=font)
+            current_total_height += info_text_height + info_top_padding
+            info_top_padding = -5
+
+        # Draw QR Code
+        if not barcode:
+            size = (bottom_padding * 2) - 19
+            code_img_aspect_ratio = code_img.width /code_img.height
+            code_img_width = badge_width
+            while code_img_width > badge_width//2.2:
+                code_img_height = badge_height - current_total_height - size - (bottom_padding + 5)
+                code_img_width = int(code_img_height * code_img_aspect_ratio)
+                size+=1
+            code_img = code_img.resize((code_img_width, code_img_height), Image.LANCZOS)
+            new_img.paste(code_img, (badge_width-code_img.width-(bottom_padding + 5), badge_height-code_img.height-(bottom_padding + 5)))
+
+        return new_img
+
 
 class DroneTag():
 
@@ -242,8 +464,9 @@ class DroneTag():
          # Get Options
         front_color = tuple(int(drone_data.get("front_color", "#FFFFFF").lstrip('#')[i:i+2], 16) for i in (0, 2, 4))
         back_color = tuple(int(drone_data.get("back_color", "#010101").lstrip('#')[i:i+2], 16) for i in (0, 2, 4))
-        data = self.drone_data.get("code_data", self.drone_id)
-        barcode_height = self.drone_data.get("barcode_height", len(data)+6)
+        data = drone_data.get("code_data", self.drone_id)
+        barcode_height = drone_data.get("barcode_height", len(data)+6)
+        quiet_zone = drone_data.get("quiet_zone", 1.8)
 
         # Barcode generation
         code128 = barcode.get("Code128", data, writer=ImageWriter())
@@ -251,7 +474,7 @@ class DroneTag():
             {
                 "module_width": 0.2,
                 "module_height": barcode_height,
-                "quiet_zone": 1.8,
+                "quiet_zone": quiet_zone,
                 "dpi": 650-(barcode_height*10),
                 "write_text": False,
                 "foreground": front_color,
@@ -278,5 +501,35 @@ class DroneTag():
 
 # Call Unit tests
 if __name__ == "__main__":
-    import Sample as sample
-    sample.main()
+    #import Sample as sample
+    #sample.main()
+    handlers = [
+        {
+            'badge_style': 1,
+            'front_color': "#dc141e",
+            'side_text': "Your Name",
+            'handler_info': ["Administator of", "00-0000"],
+            'id_image_path': "./assets/id.jpg"
+        },
+        {
+            'badge_style': 2,
+            'front_color': "#dc141e",
+            'side_text': "Your Name",
+            'handler_info': ["Administator of", "00-0000"],
+            'id_image_path': "./assets/id.jpg"
+        },
+        {
+            'badge_style': 3,
+            'front_color': "#dc141e",
+            'side_text': "Your Name",
+            'handler_info': ["Administator of", "00-0000"],
+            'id_image_path': "./assets/id.jpg"
+        },
+    ]
+    for handler in handlers:
+        handler_badge = HandlerBadge(handler)
+        file_name= f"style_{handler['badge_style']}"
+        print(handler)
+        handler_badge.save(f'./samples/{file_name}.png')
+
+
