@@ -595,7 +595,7 @@ class DroneTag():
 # Call Unit tests
 if __name__ == "__main__":
     import Sample as sample
-    #sample.drone()
+    sample.drone()
     sample.handler()
 
 

@@ -178,5 +178,5 @@ def handler():
         handler_badge.save(f'./samples/{file_name}.qrcode.png')
 
 if __name__ == "__main__":
-    #drone()
+    drone()
     handler()
