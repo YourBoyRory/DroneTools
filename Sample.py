@@ -6,7 +6,8 @@ import os, json
 ###    EXAMPLE USAGE AND UNIT TEST    ###
 #=======================================#
 
-def main():
+# drone samples
+def drone():
     drone_ids = [
         os.path.splitext(f)[0]
         for f in os.listdir("./samples")
@@ -104,6 +105,7 @@ def main():
         },
     ]
 
+
     skips = []
     for drone in drones[:]:
         #drone_ids = [] # Uncomment this out to disable collision detection
@@ -118,39 +120,63 @@ def main():
         for test in skips:
             print(f"    '{test}'")
 
-    # Handler Tests
-
+# Handler samples
+handler_side_info_1 = [
+    "prn:", "they/them", "",
+    "Gen:", "NB", "",
+    "blood:", "A","",
+    "Class:", "D",
+]
+handler_side_info_2 = [
+    "prn:", "they/", "them", "",
+    "Gen:", "NB", "",
+    "blood:", "A","",
+    "Class:", "D",
+]
+handler_side_info_3 = [
+    "prn:", "they/", "them", "",
+    "Gen:", "NB", "",
+    "blood:", "A","",
+    "Class:", "D",
+]
+def handler():
     handlers = [
         {
+            "side_text": "Your Name",
+            "handler_side_info": handler_side_info_1,
+            "front_color": "#DC141E",
             'badge_style': 1,
-            'show_badge_holder': True,
-            'front_color': "#dc141e",
-            'side_text': "Your Name",
-            'handler_info': ["Administator of", "00-0000"],
-            'id_image_path': "./assets/id.jpg"
         },
         {
+            "side_text": "Your Name",
+            "handler_side_info": handler_side_info_2,
+
+            "front_color": "#DC141E",
             'badge_style': 2,
-            'show_badge_holder': True,
-            'front_color': "#dc141e",
-            'side_text': "Your Name",
-            'handler_info': ["Administator of", "00-0000"],
-            'id_image_path': "./assets/id.jpg"
         },
         {
+            "side_text": "Your Name",
+            "handler_side_info": handler_side_info_3,
+            "front_color": "#DC141E",
             'badge_style': 3,
-            'show_badge_holder': True,
-            'front_color': "#dc141e",
-            'side_text': "Your Name",
-            'handler_info': ["Administator of", "00-0000"],
-            'id_image_path': "./assets/id.jpg"
         },
+    ]
+    qrcode_handlers = [
+        handlers[0].copy(),
+        handlers[1].copy(),
+        handlers[2].copy(),
     ]
     for handler in handlers:
         handler_badge = HandlerBadge(handler)
         file_name= f"style_{handler['badge_style']}"
-        print(handler)
-        handler_badge.save(f'./samples/{file_name}.png')
+        handler_badge.save(f'./samples/{file_name}.barcode.png')
+
+    for handler in qrcode_handlers:
+        handler['barcode'] = False
+        handler_badge = HandlerBadge(handler)
+        file_name= f"style_{handler['badge_style']}"
+        handler_badge.save(f'./samples/{file_name}.qrcode.png')
 
 if __name__ == "__main__":
-    main()
+    #drone()
+    handler()

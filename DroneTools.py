@@ -36,7 +36,7 @@ class HandlerBadge():
         badge_width = 670
         badge_height = 990
 
-        # Not changable
+        # Not current changable
         margin = 100
         top_padding = 50
         bottom_padding=30
@@ -49,10 +49,14 @@ class HandlerBadge():
         font_path = handler_data.get("font_path", "./assets/font.otf")
         id_image_path = handler_data.get("id_image_path", "./assets/id.jpg")
 
+        if barcode: default_handler_info = ["Authorized", "Administator"]
+        else: default_handler_info = ["Authorized", "Administator of", "", "Drone", "00-0000"]
+
         title = handler_data.get("top_title", "Drone")
         subtext = handler_data.get("top_subtext", "Handler")
         side_text = handler_data.get("side_text", "")
-        handler_info = handler_data.get("handler_info", [])
+        handler_info = handler_data.get("handler_info", default_handler_info)
+        handler_side_info = handler_data.get("handler_side_info", [])
 
         # Style def
         if style == 2: box_color = front_color
@@ -112,8 +116,23 @@ class HandlerBadge():
         draw.text((text_x, title_text_height+top_padding), subtext, fill=border_front_color, font=font)
         current_total_height = title_text_height+subtext_text_height+top_padding+subtext_padding+title_padding
 
+        # Only if style 1 is selected, calculate the side text size now .
+        if side_text != "" and style == 1:
+            name_top_padding = -20
+            name_bottom_padding = 40
+            if barcode: name_side_padding= 30
+            else: name_side_padding = 40
+            name_text_width = badge_height - current_total_height - name_side_padding - bottom_padding
+            name_font, name_text_height, dump = __generate_text(side_text, name_text_width, 0, 1.4, 0)
+            name_text_height = name_text_height
+            name_total_width = name_text_height+name_top_padding+name_bottom_padding
+        else: name_total_width = 0
+
         # Load barcode for later
+        code_img_height = int(badge_height*0.152)
         if barcode:
+            if style == 1:
+                code_img_height += code_img_height//10
             if style == 3:
                 barcode_padding = bottom_padding*2
                 barcode_margin = margin+50
@@ -121,17 +140,28 @@ class HandlerBadge():
                 barcode_padding = bottom_padding
                 barcode_margin = margin
             code_img_aspect_ratio = code_img.width /code_img.height
-            code_img_width = badge_width - barcode_margin
-            code_img_height = 150
+            code_img_width = badge_width - barcode_margin - name_total_width
             code_img = code_img.resize((code_img_width, code_img_height), Image.LANCZOS)
             total_code_height = code_img.height+barcode_padding
+        # Load QR code for later
         else:
-            total_code_height = 0
+            if style == 1:
+                QR_padding = int(bottom_padding*1.4)
+                code_img_height += 10
+                code_x = (margin//4)+(QR_padding//6)
+            else:
+                QR_padding = int(bottom_padding*2.2)
+                code_x = (margin//2)+(QR_padding//6)
+            code_img_aspect_ratio = code_img.width /code_img.height
+            code_img_width = badge_width
+            code_img_width = int(code_img_height * code_img_aspect_ratio)
+            code_img = code_img.resize((code_img_width, code_img_height), Image.LANCZOS)
+            total_code_height = code_img.height + QR_padding
 
         # Image Info Section background
         bg_width = badge_width-margin
-        if style == 3: bg_padding = bottom_padding
-        else: bg_padding = total_code_height
+        if not barcode or style == 3: bg_padding = bottom_padding
+        else: bg_padding = max(total_code_height, bottom_padding)
         if style == 2:
             info_back_color = front_color
             info_front_color = back_color
@@ -152,41 +182,48 @@ class HandlerBadge():
 
         # Draw barcode now
         if barcode:
-            new_img.paste(code_img, (barcode_margin//2, badge_height-code_img.height-barcode_padding))
+            new_img.paste(code_img, (barcode_margin//2+name_total_width, badge_height-code_img.height-barcode_padding))
+            total_code_width = 0
+        else:
+            new_img.paste(code_img, (code_x, badge_height-code_img.height-QR_padding))
+            total_code_width = code_img.width
 
         # Draw side text
         if side_text != "":
-            if style == 1:
-                name_top_padding = -20
-                name_bottom_padding = 40
-                name_side_padding= 30
-            else:
+            # style def for style 1 is above barcode
+            if style != 1:
                 name_top_padding = 10
                 name_bottom_padding = 0
                 name_side_padding=37
-            if style == 3: name_side_padding = name_side_padding-30
-            name_text_width = badge_height - current_total_height - total_code_height - name_side_padding
-            font, name_text_height, dump = __generate_text(side_text, name_text_width, 0, 1.4, 0)
+            if not barcode or style == 3: name_side_padding = name_side_padding-30
+            if not barcode or style != 1:
+                # For style 1, this code is above barcode
+                name_text_width = badge_height - current_total_height - name_side_padding - total_code_height
+                name_font, name_text_height, dump = __generate_text(side_text, name_text_width, 2, 1.4, 0)
             sidetext_img = Image.new("RGB", (name_text_width, name_text_height), info_back_color)
             draw_sidetext = ImageDraw.Draw(sidetext_img)
             text_x = (sidetext_img.width - name_text_width) // 2
-            draw_sidetext.text((text_x, 0), side_text, fill=info_front_color, font=font)
+            draw_sidetext.text((text_x, 0), side_text, fill=info_front_color, font=name_font)
             sidetext_img = sidetext_img.rotate(90, expand=True)
             new_img.paste(sidetext_img, (((margin//2)+name_top_padding), current_total_height))
-            current_total_width = name_text_height+name_top_padding+name_bottom_padding
+            name_total_width = name_text_height+name_top_padding+name_bottom_padding
+            current_total_width = name_total_width
         else:
             current_total_width = 0
 
         #Photo
+        photo_margin=margin//2
         badge_photo = Image.open(id_image_path)
-
         badge_photo = badge_photo.convert("RGBA")
         bagge_photo_aspect_ratio = badge_photo.width / badge_photo.height
-        bagge_photo_height = badge_width//2
+        bagge_photo_height = (badge_width//2) - photo_margin
         bagge_photo_width = int(bagge_photo_height * bagge_photo_aspect_ratio)
         badge_photo = badge_photo.resize((bagge_photo_width, bagge_photo_height), Image.LANCZOS)
-        if style == 1: photo_x = ((badge_width-current_total_width) - badge_photo.width) - margin//2
-        else: photo_x = ((badge_width-current_total_width) - badge_photo.width) // 2
+        photo_x = (badge_width-current_total_width) - badge_photo.width
+        if handler_side_info != []:
+            if style == 1: photo_x = photo_x - int(margin*0.75)
+            else: photo_x = photo_x - margin
+        else: photo_x = photo_x // 2
         # Create mask for round corners
         mask = Image.new("L", (badge_photo.width, badge_photo.height), 0)
         ImageDraw.Draw(mask).rounded_rectangle(
@@ -194,35 +231,91 @@ class HandlerBadge():
             radius=badge_photo.width // 15,
             fill=255
         )
-        new_img.paste(badge_photo, (photo_x+current_total_width, current_total_height),mask)
-        current_total_height += badge_photo.height
+
+        # Draw Photo background
+        bg_height =  badge_width//2
+        bg_width = badge_width - margin - photo_margin - current_total_width
+        if style == 1: bg_width +=  photo_margin
+        bg = Image.new("RGBA", (bg_width, bg_height), (0, 0, 0, 0))
+        # Round conrners
+        ImageDraw.Draw(bg).rounded_rectangle(
+            (0, 0, bg_width, bg_height),
+            radius=bg_width // 15,
+            fill=(*info_front_color, 255),
+
+        )
+        bg_x = ((new_img.width - current_total_width) - bg_width) // 2
+        new_img.paste(bg, (bg_x+current_total_width, current_total_height), bg)
+        new_img.paste(badge_photo, (photo_x+current_total_width, current_total_height+photo_margin//2),mask)
+        total_badge_photo_width=bagge_photo_width+(photo_margin*2)
+
+
+        # Draw Side Hander Info
+        if handler_side_info != []:
+            longest_len = len(max(handler_side_info, key=len))
+            for i, item in enumerate(handler_side_info):
+                handler_side_info[i] = item+" "*(longest_len - len(item))
+            total_side_info_text_height=0
+            new_side_info_img = None
+            current_side_info_img = None
+            for info_text in handler_side_info[::-1]:
+                if new_side_info_img:
+                    current_side_info_img = new_side_info_img
+
+                if info_text == " "*longest_len: info_bottom_padding = 20
+                else: info_bottom_padding = 0
+                info_margin = margin//2
+                # Set Font size
+                font, side_info_text_height, side_info_text_width = __generate_text(info_text, bg_width-bagge_photo_width-(photo_margin//2), info_margin, 1.4, info_bottom_padding)
+
+                # Draw new canvase
+                new_side_info_img = Image.new("RGB", (bg_width-bagge_photo_width-(photo_margin//2), side_info_text_height+total_side_info_text_height), info_front_color)
+
+                # Center Text
+                ImageDraw.Draw(new_side_info_img).text((info_margin//2, 0), info_text, fill=info_back_color, font=font)
+
+                # paste old Image
+                if current_side_info_img:
+                    new_side_info_img.paste(current_side_info_img, (0, side_info_text_height))
+                total_side_info_text_height += side_info_text_height
+            new_img.paste(new_side_info_img, (bg_x+current_total_width, current_total_height+((bg_height-total_side_info_text_height)//2)))
+
+
+        # add break here
+        current_total_height += bg_height
 
         # Draw Hander Info
-        print(handler_info)
-        info_top_padding = 15
+        info_top_padding = 10
+        info_current_total_width = current_total_width
+        last_info_text_wide = True
         for info_text in handler_info:
-            info_bottom_padding = 0
+            if info_text == "":
+                info_text = " "*10
+                info_bottom_padding = 10
+            else: info_bottom_padding = 0
             if style == 1: info_margin = margin
             else: info_margin = margin+50
-            font, info_text_height, info_text_width = __generate_text(info_text, (badge_width-current_total_width), info_margin, 1.4, info_bottom_padding)
-            text_x = ((badge_width-current_total_width) - info_text_width) // 2
-            draw.text((text_x+current_total_width, current_total_height+info_top_padding), info_text, fill=info_front_color, font=font)
-            current_total_height += info_text_height + info_top_padding
-            info_top_padding = -5
+            font, info_text_height, info_text_width = __generate_text(info_text, (badge_width-info_current_total_width), info_margin, 1.4, info_bottom_padding)
+            if not barcode and current_total_height + total_code_height + info_text_height > badge_height:
+                old_info_text_height = info_text_height + info_top_padding
+                info_current_total_width = total_code_width
+                font, info_text_height, info_text_width = __generate_text(info_text, (badge_width-info_current_total_width), info_margin, 1.4, info_bottom_padding)
+                if last_info_text_wide and last_info_text == " "*10:
+                    info_top_padding = info_top_padding +(badge_height-(current_total_height + total_code_height)) - 10
+                last_info_text_wide = False
 
-        # Draw QR Code
-        if not barcode:
-            size = (bottom_padding * 2) - 19
-            code_img_aspect_ratio = code_img.width /code_img.height
-            code_img_width = badge_width
-            while code_img_width > badge_width//2.2:
-                code_img_height = badge_height - current_total_height - size - (bottom_padding + 5)
-                code_img_width = int(code_img_height * code_img_aspect_ratio)
-                size+=1
-            code_img = code_img.resize((code_img_width, code_img_height), Image.LANCZOS)
-            new_img.paste(code_img, (badge_width-code_img.width-(bottom_padding + 5), badge_height-code_img.height-(bottom_padding + 5)))
+            #elif barcode:
+            #    print(f"To many info lines to render! Stopped at: {info_text}")
+            #    break
+            text_x = ((badge_width-info_current_total_width) - info_text_width) // 2
+            draw.text((text_x+info_current_total_width, current_total_height+info_top_padding), info_text, fill=info_front_color, font=font)
+            current_total_height += info_text_height + info_top_padding
+            last_info_text = info_text
+            if last_info_text_wide: info_top_padding = -5
+            else: info_top_padding = -10
 
         return new_img
+
 
 
 class DroneTag():
@@ -502,6 +595,7 @@ class DroneTag():
 # Call Unit tests
 if __name__ == "__main__":
     import Sample as sample
-    sample.main()
+    #sample.drone()
+    sample.handler()
 
 
