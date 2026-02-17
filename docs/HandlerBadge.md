@@ -124,7 +124,7 @@ handlers_badge.save("/path/to/output.png")
 All Options in one example.\
 Note that not all options are valid together, some will be ignored.
 
-```
+```python
 # import the class
 from DroneTools import HandlerBadge
 
