@@ -80,5 +80,5 @@ handlers_badge.save("/path/to/output.png")
 ----
 
 # Docs
-## [DroneTag](docs/drone_tag.md)
-## [HandlerBadge Docs](docs/handler_badge.md)
+## [DroneTag](docs/DroneTag.md)
+## [HandlerBadge Docs](docs/HandlerBadge.md)
