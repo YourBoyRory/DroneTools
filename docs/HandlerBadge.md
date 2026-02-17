@@ -65,3 +65,5 @@
 - `'border_radius': [ 1.0 - 0.0 ]`\
     Sets the logo's border corner roundness.\
     When ommited, the default is `0.125`.
+
+# Examples

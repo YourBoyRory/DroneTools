@@ -153,3 +153,105 @@
 - `'border_radius': [ 1.0 - 0.0 ]`\
     Sets the logo's border corner roundness.\
     When ommited, the default is `0.125`.
+
+# Examples
+## More examples and tests in [Sample.py](Sample.py#L10-L121)
+
+### Minimal Configuration
+
+This example will generate a white QR code with a hard coded ID above it.
+
+```python
+# import the class
+from DroneTools import DroneTag
+
+drone_ids = [] # This is optional. Used to track used IDs to handle hash collisions.
+
+# Make Drone
+drone_data = {
+        "id_number": "234-667",
+}
+drone_tag = DroneTag(drone_data, drone_ids)
+
+# Save your tag.
+drone_tag.save("/path/to/output.png")
+
+```
+
+### Simple Configuration
+
+This example uses the name option to generate a ID number.\
+It also sets a custom title (side Text) and a custom color.
+
+```python
+# import the class
+from DroneTools import DroneTag
+
+drone_ids = [] # This is optional. Used to track used IDs to handle hash collisions.
+
+# Make Drone
+drone_data = {
+        "name": "Rory",
+        "title": "Pup Drone",
+        "front_color": "#DC141E",
+}
+drone_tag = DroneTag(drone_data, drone_ids)
+
+# The only key needed is 'name' or 'drone_id',
+# name is used to generate a drone_id and the rest will use default values.
+
+# Save your tag.
+drone_tag.save("/path/to/output.png")
+
+```
+### Fine Grain Configuration
+All Options in one example.\
+Note that not all options are valid together, some will be ignored.
+
+```python
+# import the class
+from DroneTools import DroneTag
+
+drone_ids = [] # This is optional. Used to track used IDs to handle hash collisions.
+
+drone_data = {
+    "name": "Some Name",  # Ignored in this example because 'drone_id' is present below
+    "drone_id": "03-1312",
+    "code_data": "03-1312",
+    "title": "Poké Drone",
+    "front_color": "#DC141E",
+    "back_color": "#000000",
+    "square": True,
+    "barcode": False,
+    "barcode_height": 20, # Ignored in this example because 'barcode' is set to 'False' above
+    "qr_roundness": 1,
+
+    "top_padding": 20,
+    "bottom_padding": 0,
+    "left_padding": 20,
+    "right_padding": 0,
+    "font_path": "./assets/font.otf"
+    "text_margin": 75,    # 'text_margin' and 'text_padding' are ignored in this example because
+    "text_padding": 0,    # 'id_padding_override' + 'title_padding_override' and
+                          # 'id_margin_override' + 'title_margin_override' are set below
+    "id_size": 83,
+    "id_shift": 0,
+    "id_margin_override": 75,
+    "id_padding_override": 0,
+    "title_size": 69,
+    "title_shift": 0,
+    "title_margin_override": 75,
+    "title_padding_override": 0,
+
+    "logo": "./assets/rocket.png",
+    "logo_color": "#DC141E",
+    "logo_size": 0.2,
+    "logo_border": 0.2,
+    "border_radius": 0.125
+}
+drone_tag = DroneTag(drone_data, drone_ids)
+
+# Save your tag.
+drone_tag.save("/path/to/output.png")
+
+```
