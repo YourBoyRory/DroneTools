@@ -1,10 +1,20 @@
 # DroneTools
-## DroneTag -  Python Library for creating drone IDs
+## DroneTag -  Python module for creating drone IDs
+
+- Generate QR code or Barcode
+- Customizable text, font, colors, and logos
+
+See [DroneTag Docs](docs/DroneTag.md)
 
 <img src="https://raw.githubusercontent.com/YourBoyRory/DroneTools/refs/heads/main/samples/static/03-1312.png" width="300" /> <img src="https://raw.githubusercontent.com/YourBoyRory/DroneTools/refs/heads/main/samples/static/%230000.png" width="300" />\
 <img src="https://raw.githubusercontent.com/YourBoyRory/DroneTools/refs/heads/main/samples/static/U992.png" width="364" /> <img src="https://raw.githubusercontent.com/YourBoyRory/DroneTools/refs/heads/main/samples/static/12-1290.png" width="234" />
 
-## HandlerBadge -  Python Library for creating handler IDs
+## HandlerBadge -  Python module for creating handler IDs
+
+- 3 styles to chose from that change with QR code or Barcode
+- Customizable text, font, colors, logos, and ID image
+
+See [HandlerBadge Docs](docs/HandlerBadge.md)
 
 <img src="https://raw.githubusercontent.com/YourBoyRory/DroneTools/refs/heads/main/samples/static/style_1.barcode.png" width="250" /> <img src="https://raw.githubusercontent.com/YourBoyRory/DroneTools/refs/heads/main/samples/static/style_2.barcode.png" width="250" /> <img src="https://raw.githubusercontent.com/YourBoyRory/DroneTools/refs/heads/main/samples/static/style_3.barcode.png" width="250" />\
 <img src="https://raw.githubusercontent.com/YourBoyRory/DroneTools/refs/heads/main/samples/static/style_1.qrcode.png" width="250" /> <img src="https://raw.githubusercontent.com/YourBoyRory/DroneTools/refs/heads/main/samples/static/style_2.qrcode.png" width="250" /> <img src="https://raw.githubusercontent.com/YourBoyRory/DroneTools/refs/heads/main/samples/static/style_3.qrcode.png" width="250" /> 

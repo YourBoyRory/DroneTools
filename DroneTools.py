@@ -41,20 +41,27 @@ class HandlerBadge():
         top_padding = 50
         bottom_padding=30
 
+        # General
         style= handler_data.get("badge_style", 2)
         barcode = handler_data.get("barcode", True)
         show_badge_holder = handler_data.get("show_badge_holder", False)
         front_color = tuple(int(handler_data.get("front_color", "#FFFFFF").lstrip('#')[i:i+2], 16) for i in (0, 2, 4))
         back_color = tuple(int(handler_data.get("back_color", "#010101").lstrip('#')[i:i+2], 16) for i in (0, 2, 4))
+
+        # Text Option
         font_path = handler_data.get("font_path", "./assets/font.otf")
         id_image_path = handler_data.get("id_image_path", "./assets/id.jpg")
 
-        if barcode: default_handler_info = ["Authorized", "Administator"]
-        else: default_handler_info = ["Authorized", "Administator of", "", "Drone", "00-0000"]
-
+        #Header
         title = handler_data.get("top_title", "Drone")
         subtext = handler_data.get("top_subtext", "Handler")
+
+        # Side Text
         side_text = handler_data.get("side_text", "")
+
+        # Info block
+        if barcode: default_handler_info = ["Authorized", "Administator"]
+        else: default_handler_info = ["Authorized", "Administator of", "", "Drone", "00-0000"]
         handler_info = handler_data.get("handler_info", default_handler_info)
         handler_side_info = handler_data.get("handler_side_info", [])
 

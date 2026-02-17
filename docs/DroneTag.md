@@ -1,5 +1,5 @@
 # DroneTools Docs | DroneTag
-## DroneTag - Python Library for creating drone IDs
+## DroneTag - Python module for creating drone IDs
 
 `drone_tag = DroneTag(drone_data, drone_ids)`
 
