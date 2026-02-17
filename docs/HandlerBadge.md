@@ -67,4 +67,78 @@
     When ommited, the default is `0.125`.
 
 # Examples
-## More examples and tests in [Sample.py](../Sample.py#L142-L178)
+More examples and tests in [Sample.py](../Sample.py#L142-L178)
+
+### Minimal Configuration
+
+This example will generate a white badge with all default values.
+
+```python
+# import the class
+from DroneTools import HandlerBadge
+
+# Make Drone
+handlers_badge = HandlerBadge()
+
+# Save your badge.
+handlers_badge.save("/path/to/output.png")
+
+```
+
+### Simple Configuration
+
+This example puts custom text in the space next to the photo\
+It also sets a custom side text, the IDs name in this case, and a custom color.
+
+```python
+# import the class
+from DroneTools import HandlerBadge
+
+# Array for stats info
+handler_side_info = [
+    "prn:", "they/them", "",
+    "Gen:", "NB", "",
+    "blood:", "A","",
+    "Class:", "D",
+]
+
+# Make Badge
+handlers_data = {
+    "side_text": "Your Name",
+	"handler_side_info": handler_side_info,
+	"id_image_path": "./assets/id.jpg",
+    "front_color": "#DC141E",
+    "badge_style": 1,
+},
+handlers_badge = HandlerBadge(handlers_data)
+
+# Any not supplied keys will use default values or not be rendered.
+# See Docs and Samples for more info
+
+# Save your badge.
+handlers_badge.save("/path/to/output.png")
+
+```
+
+### Fine Grain Configuration
+All Options in one example.\
+Note that not all options are valid together, some will be ignored.
+
+```
+# import the class
+from DroneTools import HandlerBadge
+
+# Array for stats info
+handler_side_info = [
+    "prn:", "they/them", "",
+    "Gen:", "NB", "",
+    "blood:", "A","",
+    "Class:", "D",
+]
+
+# WIP
+
+# Save your badge.
+handlers_badge.save("/path/to/output.png")
+
+```

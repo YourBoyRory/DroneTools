@@ -155,7 +155,7 @@
     When ommited, the default is `0.125`.
 
 # Examples
-## More examples and tests in [Sample.py](../Sample.py#L10-L121)
+More examples and tests in [Sample.py](../Sample.py#L10-L121)
 
 ### Minimal Configuration
 

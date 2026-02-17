@@ -60,7 +60,7 @@ handler_side_info = [
     "Class:", "D",
 ]
 
-# Make Drone
+# Make Badge
 handlers_data = {
     "side_text": "Your Name",
 	"handler_side_info": handler_side_info,
