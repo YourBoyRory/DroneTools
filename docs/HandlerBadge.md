@@ -137,7 +137,8 @@ handler_side_info = [
 ]
 
 # WIP
-
+handlers_data = {}
+handlers_badge = HandlerBadge(handlers_data)
 # Save your badge.
 handlers_badge.save("/path/to/output.png")
 

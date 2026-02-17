@@ -66,7 +66,7 @@ handlers_data = {
 	"handler_side_info": handler_side_info,
     "front_color": "#DC141E",
     "badge_style": 1,
-},
+}
 handlers_badge = HandlerBadge(handlers_data)
 
 # Any not supplied keys will use default values or not be rendered.
