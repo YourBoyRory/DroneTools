@@ -67,3 +67,4 @@
     When ommited, the default is `0.125`.
 
 # Examples
+## More examples and tests in [Sample.py](../Sample.py#L142-L178)
