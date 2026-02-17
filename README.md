@@ -6,7 +6,7 @@
 
 ## HandlerBadge -  Python Library for creating handler IDs
 
-<img src="https://raw.githubusercontent.com/YourBoyRory/DroneTools/refs/heads/main/samples/static/style_1.barcode.png" width="250" /> <img src="https://raw.githubusercontent.com/YourBoyRory/DroneTools/refs/heads/main/samples/static/style_2.barcode.png" width="250" /> <img src="https://raw.githubusercontent.com/YourBoyRory/DroneTools/refs/heads/main/samples/static/style_3.barcode.png" width="250" />\ 
+<img src="https://raw.githubusercontent.com/YourBoyRory/DroneTools/refs/heads/main/samples/static/style_1.barcode.png" width="250" /> <img src="https://raw.githubusercontent.com/YourBoyRory/DroneTools/refs/heads/main/samples/static/style_2.barcode.png" width="250" /> <img src="https://raw.githubusercontent.com/YourBoyRory/DroneTools/refs/heads/main/samples/static/style_3.barcode.png" width="250" />\
 <img src="https://raw.githubusercontent.com/YourBoyRory/DroneTools/refs/heads/main/samples/static/style_1.qrcode.png" width="250" /> <img src="https://raw.githubusercontent.com/YourBoyRory/DroneTools/refs/heads/main/samples/static/style_2.qrcode.png" width="250" /> <img src="https://raw.githubusercontent.com/YourBoyRory/DroneTools/refs/heads/main/samples/static/style_3.qrcode.png" width="250" /> 
 
 ----
@@ -19,7 +19,7 @@ pip install -r requirements.txt
 ## Getting Started
 ### DroneTag
 More examples and tests in [Sample.py](Sample.py#L10-L121)\
-Documentation and usage can be found in [DroneTag Docs](docs/drone_tag.md)
+Documentation and usage can be found in [DroneTag Docs](docs/DroneTag.md)
 
 ```python
 # import the class
@@ -46,7 +46,7 @@ drone_tag.save("/path/to/output.png")
 
 ### HandlerBadge
 More examples and tests in [Sample.py](Sample.py#L142-L178)\
-Documentation and usage can be found in [HandlerBadge Docs](docs/handler_badge.md)
+Documentation and usage can be found in [HandlerBadge Docs](docs/HandlerBadge.md)
 
 ```python
 # import the class
