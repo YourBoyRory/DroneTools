@@ -61,7 +61,7 @@
 	["Authorized", "Administator of", "", "Drone", "00-0000"]
 	# This string is used as defult on all styles when QR code is in use, See README.md.
 	# The empty string is used to inset an empty line.
-	# The empty line lines up with the break of the QR code and inherit its spacing
+	# the empty line in space 3 happens to lines up with the break of the QR code and inherit its spacing
 	```
 	When ommited, a defult string is used based on the selected style.
 - `'handler_side_info': ARRAY[STRING]`  
@@ -150,6 +150,7 @@ It also sets a custom side text, the IDs name in this case, and a custom color.
 from DroneTools import HandlerBadge
 
 # Array for stats info
+# empty string insert a empty line.
 handler_side_info = [
     "prn:", "they/them", "",
     "Gen:", "NB", "",
@@ -160,10 +161,9 @@ handler_side_info = [
 # Make Badge
 handlers_data = {
     "side_text": "Your Name",
-	"handler_side_info": handler_side_info,
+	"handler_side_info": handler_side_info, # See array above
 	"id_image_path": "./assets/id.jpg",
     "front_color": "#DC141E",
-    "badge_style": 1,
 },
 handlers_badge = HandlerBadge(handlers_data)
 
@@ -177,23 +177,55 @@ handlers_badge.save("/path/to/output.png")
 
 ### Fine Grain Configuration
 All Options in one example.  
-Note that not all options are valid together, some will be ignored.
 
 ```python
 # import the class
 from DroneTools import HandlerBadge
 
+# Array for text under image
+# empty string insert a empty line.
+# If the empty line lines up with the break of the QR code, it will inherit its spacing.
+handler_info = [
+	"Authorized",
+	"Administator of",
+	"",	# This empty line happens to lines up with the break of the QR code and inherit its spacing.
+	"Drone", 
+	"00-0000"
+]
+
 # Array for stats info
+# empty string insert a empty line.
 handler_side_info = [
-    "prn:", "they/them", "",
+    "prn:", "they/","them", "",
     "Gen:", "NB", "",
     "blood:", "A","",
     "Class:", "D",
 ]
 
-# WIP
-handlers_data = {}
+# Make Badge
+handlers_data = {
+	"badge_style": 1,
+	"id_image_path": "./assets/id.jpg",
+	"barcode": False,
+    "front_color": "#DC141E",
+    "back_color": "#000000",
+
+	"font_path": "./assets/font.otf"
+	"top_title": "Drone"
+	"top_subtext": "Handler",
+	"side_text": "Your Name",
+	"handler_side_info": handler_side_info, # See array above
+	'handler_info': handler_info,           # See array above
+
+	"qr_roundness": 1,
+    "logo": "./assets/rocket.png",
+    "logo_color": "#DC141E",
+    "logo_size": 0.2,
+    "logo_border": 0.2,
+    "border_radius": 0.125
+},
 handlers_badge = HandlerBadge(handlers_data)
+
 # Save your badge.
 handlers_badge.save("/path/to/output.png")
 
