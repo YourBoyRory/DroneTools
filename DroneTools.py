@@ -274,6 +274,11 @@ class HandlerBadge():
                 # Center Text
                 ImageDraw.Draw(new_side_info_img).text((info_margin//2, 0), info_text, fill=info_back_color, font=font)
 
+                if new_side_info_img.height > bg_height-40:
+                    print(f"To many info lines to render! Stopped at: {info_text}")
+                    new_side_info_img = current_side_info_img
+                    break
+
                 # paste old Image
                 if current_side_info_img:
                     new_side_info_img.paste(current_side_info_img, (0, side_info_text_height))
@@ -301,12 +306,12 @@ class HandlerBadge():
                 info_current_total_width = total_code_width
                 font, info_text_height, info_text_width = __generate_text(info_text, (badge_width-info_current_total_width), info_margin, 1.4, info_bottom_padding)
                 if last_info_text_wide and last_info_text == " "*10:
-                    info_top_padding = info_top_padding +(badge_height-(current_total_height + total_code_height)) - 10
+                    info_top_padding = info_top_padding +(badge_height-(current_total_height + total_code_height)) - 6.5
                 last_info_text_wide = False
 
-            #elif barcode:
-            #    print(f"To many info lines to render! Stopped at: {info_text}")
-            #    break
+            elif current_total_height + total_code_height + info_text_height > badge_height:
+                print(f"To many info lines to render! Stopped at: {info_text}")
+                break
             text_x = ((badge_width-info_current_total_width) - info_text_width) // 2
             draw.text((text_x+info_current_total_width, current_total_height+info_top_padding), info_text, fill=info_front_color, font=font)
             current_total_height += info_text_height + info_top_padding
