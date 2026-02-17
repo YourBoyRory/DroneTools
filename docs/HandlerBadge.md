@@ -1,4 +1,4 @@
-# DroneTools Docs | HandlerBadge (WIP)
+# DroneTools Docs | HandlerBadge
 ## HandlerBadge - Python module for creating handler IDs
 
 `handler_badge = HandlerBadge(handler_data)`
