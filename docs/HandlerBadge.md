@@ -15,7 +15,7 @@
 
 ## General Options
 - `'badge_style': [ 1 - 3 ]`  
-    Sets the style of the badge to one of the 3 options as shown in the [README.md](../README.md#handlerbadge----python-library-for-creating-handler-ids).  
+    Sets the style of the badge to one of the 3 options as shown in the [README.md](../README.md#handlerbadge----python-module-for-creating-handler-ids).  
 	These styles change slightly based on if a QR code or barcode is selected.  
     When ommited, the default is 1.
 - `'front_color': HEX COLOR`  
